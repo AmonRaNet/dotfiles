@@ -162,7 +162,7 @@ focus_follows_mouse no
 workspace_layout default
 
 # Paper Colors
-set $bgcolor #DEDFE3
+set $bgcolor #757575
 set $fgcolor #444444
 set $base02 #969694
 set $base08 #D7005F
@@ -180,7 +180,7 @@ bar {
     font pango:open sans 8
     strip_workspace_numbers yes
     colors {
-           background #DEDFE3
+           background $bgcolor
            statusline #767E8A
            separator #51c4d4
 
@@ -231,6 +231,8 @@ exec --no-startup-id "setxkbmap -model pc105 -layout de,ru -option grp:alt_shift
 assign [class="Pidgin"] 9
 for_window [window_role="pop-up"] floating enable
 
-exec --no-startup-id '.config/i3/display.sh'
+exec --no-startup-id .config/i3/display.sh 
+exec --no-startup-id gnome-settings-daemon
 exec --no-startup-id i3-msg reload
 exec --no-startup-id i3-msg restart
+
