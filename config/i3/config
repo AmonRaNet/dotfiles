@@ -254,10 +254,10 @@ bindsym XF86Mail exec --no-startup-id thunderbird -mail
 bindsym XF86HomePage exec --no-startup-id xdg-open ~
 bindsym XF86Sleep mode "$mode_system"
 
-exec --no-startup-id .config/i3/display.sh
+# Exec by start
 exec --no-startup-id "setxkbmap -model pc105 -layout de,ru -option grp:alt_shift_toggle"
 exec --no-startup-id i3-msg 'workspace 9; exec dex -ae i3'
 exec --no-startup-id gnome-settings-daemon
-exec --no-startup-id i3-msg reload
-exec --no-startup-id i3-msg restart
 
+# Display settings
+exec --no-startup-id .config/i3/display.sh
