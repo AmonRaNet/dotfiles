@@ -216,6 +216,7 @@ bindsym Mod1+Tab          exec "rofi -show window"
 bindsym Mod1+space        exec "rofi -show combi -combi-modi drun,run -modi combi"
 bindsym Mod1+s            exec "rofi -show ssh"
 bindsym $mod+Shift+Return exec google-chrome
+bindsym $mod+Shift+M      exec --no-startup-id .config/i3/display_switch.sh
 
 # overwrite original (replace by PageDown/Up)
 bindsym $mod+Next   focus child
@@ -249,15 +250,16 @@ bindsym XF86AudioNext exec rhythmbox-client --next
 bindsym XF86AudioPrev exec rhythmbox-client --previous
 
 # Others special controls
+bindsym XF86Tools exec rhythmbox-client --play
 bindsym XF86Calculator exec --no-startup-id gnome-calculator
 bindsym XF86Mail exec --no-startup-id thunderbird -mail
 bindsym XF86HomePage exec --no-startup-id xdg-open ~
+bindsym XF86Search exec --no-startup-id google-chrome google.com
 bindsym XF86Sleep mode "$mode_system"
 
 # Exec by start
 exec --no-startup-id "setxkbmap -model pc105 -layout de,ru -option grp:alt_shift_toggle"
 exec --no-startup-id i3-msg 'workspace 9; exec dex -ae i3'
 exec --no-startup-id gnome-settings-daemon
-
-# Display settings
 exec --no-startup-id .config/i3/display.sh
+
