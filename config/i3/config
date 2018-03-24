@@ -217,7 +217,7 @@ bindsym Mod1+space        exec "rofi -show combi -combi-modi drun,run -modi comb
 bindsym Mod1+s            exec "rofi -show ssh"
 bindsym $mod+Shift+Return exec google-chrome
 bindsym $mod+Shift+M      exec --no-startup-id .config/i3/display_switch.sh
-bindsym Print             exec scrot -e 'mv $f /tmp/ && gimp /tmp/$f'
+bindsym Print             exec --no-startup-id .config/i3/screenshot.sh
 
 # overwrite original (replace by PageDown/Up)
 bindsym $mod+Next   focus child
