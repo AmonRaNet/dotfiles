@@ -127,6 +127,14 @@ is_ubuntu() {
     return 1
 }
 
+is_ubuntu18() {
+    local ubuntu=$(lsb_release -cs)
+    if [ "$ubuntu" = "bionic" ]; then
+        return
+    fi
+    return 1
+}
+
 # Apply sudo for terminal
 sudo -v
 

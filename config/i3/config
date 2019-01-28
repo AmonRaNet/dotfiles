@@ -174,7 +174,7 @@ set $mode_system System (l) lock, (Shift+l) auto-lock, (e) logout, (s) suspend, 
 mode "$mode_system" {
     bindsym l       exec --no-startup-id i3-custom-lock, mode "default"
     bindsym Shift+l exec --no-startup-id i3-custom-settings autolock, mode "default"
-    bindsym e       exec --no-startup-id i3-msg exit
+    bindsym e       exec --no-startup-id i3-custom-settings session-quit
     bindsym s       exec --no-startup-id i3-custom-power suspend, mode "default"
     bindsym h       exec --no-startup-id i3-custom-power hibernate, mode "default"
     bindsym r       exec --no-startup-id i3-custom-power reboot
@@ -315,4 +315,4 @@ for_window [class="(?i)arandr"] floating enable, sticky enable
 for_window [class="(?i)kazam"] floating enable
 
 # Exec by start
-exec --no-startup-id i3-custom-settings session-init
+exec --no-startup-id i3-custom-settings session

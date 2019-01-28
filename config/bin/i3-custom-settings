@@ -24,16 +24,18 @@ write_display_mode () {
 }
 
 apply_display_mode () {
+    local notify_opt="--icon=video-display Display"
     local current=$(current_display_mode)
     if [ "$current" = "none" ]; then
        echo "No display mode change"
-       notify-send "Display mode: no change"
+       local resolution=$(xrandr | grep \* | awk '{print $1}')
+       notify-send $notify_opt "Current mode: no change\n$resolution"
        return
     fi
     echo "Apply display mode: $current"
     eval $current
-    detach bash -c "sleep 2 ; i3-msg restart"
-    notify-send "Display mode: $(basename -- $current)"
+    notify-send $notify_opt "Current mode: $(basename -- $current)"
+    sleep 2 && i3-msg restart &
 }
 
 current_autolock_time () {
@@ -50,27 +52,23 @@ write_autolock_time () {
 }
 
 apply_autolock() {
-    local timer=$(current_autolock_time)
+    local notify_opt="--icon=system-lock-screen -u critical Lock"
+    local lock_timer=$(current_autolock_time)
     echo "Kill xautolock"
     pkill xautolock || true
-    if [ "$timer" = "off" ]; then
-        notify-send -u critical "Auto-lock disabled"
+    if [ "$lock_timer" = "off" ]; then
+        notify-send $notify_opt "Auto-lock disabled"
         return
     fi
-    echo "Start xautolock for $timer min"
+    echo "Start xautolock for $lock_timer min"
     local notify_timer=10
+    local notify_app="notify-send -t ${notify_timer}000 $notify_opt 'Lock screen in $notify_timer sec'"
     xautolock -detectsleep \
               -locker "i3-custom-lock" \
-              -time $timer \
-              -notify $notify_timer \
-              -notifier "notify-send -u critical -t ${notify_timer}000 -- 'Lock screen in $notify_timer sec'" &
-    notify-send -u critical "Auto-lock enabled (every $timer min)"
-}
-
-init_desktop_session() {
-    echo "Start gnome session"
-    detach gnome-settings-daemon
-    detach gnome-session
+              -time "$lock_timer" \
+              -notify "$notify_timer" \
+              -notifier "$notify_app" &
+    notify-send $notify_opt "Auto-lock enabled (every $lock_timer min)"
 }
 
 init_keyboard_layout() {
@@ -85,19 +83,43 @@ init_compton() {
     compton -b --config=$home/.config/compton/compton.conf
 }
 
-init_persist_i3_scripts() {
-    echo "Start persist i3 scripts"
-    detach bash -c "sleep 2 ; python3 $home/.config/i3/scripts/autoname_workspaces.py"
+init_i3scripts() {
+    echo "Start i3 scripts"
+    sleep 2 && python3 $home/.config/i3/scripts/autoname_workspaces.py &
+}
+
+user_session_start() {
+    echo "Start gnome session"
+    gnome-session --session=ubuntu &
+    if [ -f /usr/lib/gnome-settings-daemon/gnome-settings-daemon ]; then
+        echo "Start gnome-settings-daemon"
+        gnome-settings-daemon &
+    else
+        for filename in /usr/lib/gnome-settings-daemon/gsd-*; do
+            [ -f "$filename" ] || continue
+            echo "Start $filename"
+            eval $filename &
+        done
+    fi
+}
+
+user_session_quit() {
+    echo "Stop gnome session"
+    gnome-session-quit --logout --force --no-prompt
+    i3-msg exit
 }
 
 case "$1" in
-        session-init)
-            init_desktop_session
-            init_keyboard_layout
+        session)
+            user_session_start
             init_compton
+            init_i3scripts
+            init_keyboard_layout
             apply_display_mode
             apply_autolock
-            init_persist_i3_scripts
+            ;;
+        session-quit)
+            user_session_quit
             ;;
         display-switch)
             current=$(current_display_mode)

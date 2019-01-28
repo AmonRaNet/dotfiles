@@ -34,6 +34,11 @@ source-auto enable bash
 sudo apt-get --assume-yes --no-install-recommends install git
 sudo apt-get --assume-yes --no-install-recommends install build-essential
 
+# prepare ubuntu
+if is_ubuntu18; then
+    sudo add-apt-repository universe
+fi
+
 # install setup files
 for filename in $DIR/setup_*.sh
 do
