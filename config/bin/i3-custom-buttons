@@ -1,0 +1,44 @@
+#! /bin/bash
+set -e
+
+case "$1" in
+        backlight-up)
+            xbacklight -inc 20
+            ;;
+        backlight-down)
+            xbacklight -dec 20
+            ;;
+        volume-up)
+            pactl set-sink-volume @DEFAULT_SINK@ +5%
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        volume-down)
+            pactl set-sink-volume @DEFAULT_SINK@ -5%
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        volume-mute)
+            pactl set-sink-mute @DEFAULT_SINK@ toggle
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        play)
+            set +e
+            if ! rhythmbox-client --check-running; then
+                detach rhythmbox-client --play-uri=http://ubuntu.hbr1.com:19800/trance.ogg
+                exit
+            fi
+            set -e
+            rhythmbox-client --play-pause
+            ;;
+        pause)
+            rhythmbox-client --play-pause
+            ;;
+        next)
+            rhythmbox-client --next
+            ;;
+        prev)
+            rhythmbox-client --previous
+            ;;
+        *)
+            echo "Unexpected arg $0"
+            exit 1
+esac

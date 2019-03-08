@@ -1,0 +1,20 @@
+#! /bin/bash
+set -e
+
+case "$1" in
+        poweroff)
+            systemctl poweroff
+            ;;
+        reboot)
+            systemctl reboot
+            ;;
+        suspend)
+            systemctl suspend
+            ;;
+        hibernate)
+            systemctl hibernate
+            ;;
+        *)
+            echo "Unexpected arg $0"
+            exit 1
+esac

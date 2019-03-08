@@ -1,0 +1,19 @@
+#! /bin/bash
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "AmonRaNet: install source-auto tool"
+    echo "           sudo will be requested!"
+    exit
+fi
+
+sudo -v
+
+echo "install source-auto..."
+for subdir in $DIR/*/
+do
+    sudo cp -vR $subdir /usr/
+done
+echo "done!"

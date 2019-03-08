@@ -1,0 +1,46 @@
+#! /bin/bash
+set -e
+
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    echo "AmonRaNet: install tools for Linux"
+    echo "           sudo will be requested!"
+    exit
+fi
+
+source $DIR/config.sh
+
+for filename in $DIR/setup_*.sh
+do
+    [ -f "$filename" ] || continue
+    shortname=$(basename -- "$filename")
+    description="$(eval "$filename --help")"
+    list="$list $shortname \"$description\" on"
+done
+
+set +e
+choice=($(eval \
+  "whiptail --notags \
+  --checklist \"Setup (AmonRaNet)\" 20 80 6 \
+  $list 3>&1 1>&2 2>&3"))
+no_choice_exit
+set -e
+
+# install basic tools
+echo_install "basic tools"
+$DIR/source-auto/install
+source-auto enable bash
+sudo apt-get --assume-yes --no-install-recommends install git
+sudo apt-get --assume-yes --no-install-recommends install build-essential
+
+# install setup files
+for filename in $DIR/setup_*.sh
+do
+   [ -f "$filename" ] || continue
+   shortname=$(basename -- "$filename")
+   if is_install "$shortname"; then
+       echo_install "$shortname"
+       eval "$DIR/$shortname"
+   fi
+done

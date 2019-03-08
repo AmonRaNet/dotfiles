@@ -1,0 +1,5 @@
+#!/bin/bash
+
+echo "Run in detach mode (nohup): $@"
+nohup "$@" > /dev/null 2>&1 &
+sleep 0.1

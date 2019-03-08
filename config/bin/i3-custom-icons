@@ -1,0 +1,34 @@
+#! /bin/bash
+set -e
+
+ICONS=( "OUT:"
+        "IN:"
+        "CPU:"
+        "TIME:"
+        "DATE:"
+        "NUM:"
+        "CAPS:"
+        "NETWORK:"
+        "WIFI:"
+        "SOUND:♪"
+        "MUTE:"
+        "LAYOUT:"
+        "HOME:"
+        "MEMORY:"
+        "DISK:"
+        "SWAP:"
+      )
+
+if [ ! "$#" -eq 0 ]; then
+  echo "$@" | ./$0
+  exit
+fi
+
+while IFS= read -r line; do
+  for icon in "${ICONS[@]}"; do
+    KEY="${icon%%:*}"
+    VALUE="${icon##*:}"
+    line="$(echo "$line" | sed "s/\b${KEY}\b/${VALUE}/g")"
+  done
+  echo "$line"
+done

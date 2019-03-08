@@ -1,0 +1,40 @@
+#! /bin/bash
+set -e
+
+app_exists() {
+    set +e
+    command -v $1 > /dev/null
+    local result=$?
+    set -e
+    return $result
+}
+
+# screenshot with Lightshot (over wine)
+if app_exists "wine"; then
+    home="$(readlink -f ~)"
+    lighshot_dir=("$home/.wine/drive_c/Program Files (x86)/Skillbrains/lightshot" \
+                  "$home/.wine/drive_c/Program Files/Skillbrains/lightshot")
+    for dir in "${lighshot_dir[@]}"; do
+        if [ -d "$dir" ]; then
+            detach wine "$dir/Lightshot.exe"
+            notify-send Screenshot "Lightshot open in system menu\nUse 'Take a screenshot'"
+            exit
+        fi
+    done
+fi
+
+# sreenshot with kazam
+if app_exists "kazam"; then
+    kazam
+    notify-send Screenshot "Screenshot in kazam"
+    exit
+fi
+
+# sreenshot with scrot + gimp
+if app_exists "scrot" && app_exists "gimp"; then
+    scrot -e 'mv $f /tmp/ && gimp /tmp/$f'
+    notify-send Screenshot "Screenshot in GIMP"
+    exit
+fi
+
+notify-send -u critical "No tools for screenshot!"
