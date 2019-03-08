@@ -1,0 +1,173 @@
+#!/bin/bash
+
+# Use colors, but only if connected to a terminal, and that terminal
+# supports them.
+if which tput >/dev/null 2>&1; then
+    ncolors=$(tput colors)
+fi
+if [ -t 1 ] && [ -n "$ncolors" ] && [ "$ncolors" -ge 8 ]; then
+  RED="$(tput setaf 1)"
+  GREEN="$(tput setaf 2)"
+  YELLOW="$(tput setaf 3)"
+  BLUE="$(tput setaf 4)"
+  WHITE="$(tput setaf 7)"
+  BOLD="$(tput bold)"
+  NORMAL="$(tput sgr0)"
+else
+  RED=""
+  GREEN=""
+  YELLOW=""
+  BLUE=""
+  WHITE=""
+  BOLD=""
+  NORMAL=""
+fi
+
+set -e
+
+echoerr() { cat <<< "$@" 1>&2; }
+
+wrong_cmd=100
+exit_wrong_cmd () {
+    exit $wrong_cmd
+}
+function _finish {
+    code=$?
+    if [ $code = $wrong_cmd ]; then
+        echoerr "${RED}Supported shells: ${WHITE}bash, fish, zsh${NORMAL}"
+        echoerr "${RED}Command to enable/disable sources, example ${WHITE}enable/disable shell${NORMAL}"
+        echoerr "${RED}Command to list/path/show/print/edit sources, example ${WHITE}list/path/show/print/edit shell/* foo/*${NORMAL}"
+        echoerr "${RED}Command to link file, example ${WHITE}link shell foo path/to/file${NORMAL}"
+        echoerr "${RED}Command to add script, example ${WHITE}script shell foo \"export MY_FOO=1\"${NORMAL}"
+        echoerr "${RED}Command to remove files, example ${WHITE}remove shell/* foo/*${NORMAL}"
+    fi
+}
+trap _finish EXIT
+
+contains_line() {
+    local line="$1"
+    local file="$2"
+    local line_esc=$(echo "$line" | sed -e 's/[\/&]/\\&/g')
+    local line_num=$(sed -n '/'"$line_esc"'/=' "$file")
+    if [ "$line_num" != "" ]; then
+        echo "yes"
+        return
+    fi
+    echo "no"
+}
+
+add_line() {
+    echo "$1" >> $2
+}
+
+remove_line() {
+    local line=$1
+    local file=$2
+    local line_esc=$(echo $line | sed -e 's/[\/&]/\\&/g')
+    local line_num=$(sed -n '/'"$line_esc"'/=' "$file")
+    local line_num=$(echo "$line_num" | sed 's/\s/,/g')
+    sed -i ''"$line_num"'d' $file
+}
+
+origin_source=~/.source-auto
+origin_init=/usr/etc/source-auto
+mkdir -p $origin_source
+command=$1
+
+if [ "$command" = "path" ] || [ "$command" = "list" ] || \
+   [ "$command" = "show" ] || [ "$command" = "print" ] || \
+   [ "$command" = "edit" ] || [ "$command" = "remove" ]; then
+    shell=${2:-"*"}
+    name=${3:-"*"}
+    if [ "$name" != *"*"* ]; then
+        name="*$name*"
+    fi
+    for filename in $origin_source/$shell/$name; do
+        [ -e "$filename" ] || continue
+        find_name=$(basename -- $filename)
+        find_shell=$(basename -- $(dirname $filename))
+        if [ "$command" = "path" ]; then
+            echo "$filename"
+        fi
+        if [ "$command" = "list" ]; then
+            echo "${BLUE}Auto-source: ${GREEN}$find_shell${NORMAL} ${BOLD}$find_name${NORMAL}"
+        fi
+        if [ "$command" = "show" ]; then
+            echo "${BLUE}Auto-source: ${GREEN}$find_shell${NORMAL} ${BOLD}$find_name${NORMAL}"
+            echo "${BOLD}Source: $filename${NORMAL}"
+            echo "${BOLD}Origin: $(readlink -f $filename)${NORMAL}"
+            echo ""
+            cat $filename || true
+            echo ""
+        fi
+        if [ "$command" = "print" ]; then
+            cat $filename || true
+        fi
+        if [ "$command" = "edit" ]; then
+            sensible-editor "$filename"
+        fi
+        if [ "$command" = "remove" ]; then
+            echo "${BLUE}Remove: ${GREEN}$find_shell${NORMAL} ${BOLD}$find_name${NORMAL}"
+            rm -vf $filename
+        fi
+    done
+    exit
+fi
+
+if [ "$command" = "link" ] || [ "$command" = "script" ]; then
+    shell=$2
+    to_name=$3
+    to_path=$origin_source/$shell
+    to_file=$to_path/${to_name}.${shell}
+    [ "$shell" != "" ] || exit_wrong_cmd
+    [ "$to_name" != "" ] || exit_wrong_cmd
+    if [ -e $to_file ]; then
+        echo "${BLUE}Remove source: ${BOLD}$to_name for $shell${NORMAL}"
+        rm -vf $to_file
+    fi
+    if [ "$command" = "link" ]; then
+        from_file=$4
+        [ "$from_file" != "" ] || exit_wrong_cmd
+        echo "${GREEN}Link new source file: ${BOLD}$to_name($from_file) for $shell${NORMAL}"
+        mkdir -p $to_path
+        ln -s $from_file $to_file
+    fi
+    if [ "$command" = "script" ]; then
+        script="${@: 4}"
+        [ "$script" != "" ] || exit $wrong_cmd
+        echo "${GREEN}Create new source file for ${BOLD}$to_name for $shell${NORMAL}"
+        mkdir -p $to_path
+        touch $to_file
+        echo -e "#!/bin/$shell\n\n# Auto-source script\n$script" >> $to_file
+    fi
+    exit
+fi
+
+if [ "$command" = "enable" ] || [ "$command" = "disable" ]; then
+    shell=$2
+    [ "$shell" != "" ] || exit_wrong_cmd
+    init_target=""
+    init_script=""
+    if [ "$shell" = "bash" ] || [ "$shell" = "zsh" ]; then
+        init_target=~/.${shell}rc
+        init_script="source $origin_init/init.${shell}"
+    fi
+    if [ "$shell" = "fish" ]; then
+        init_target=~/.config/fish/config.fish
+        init_script="source $origin_init/init.fish"
+    fi
+    [ "$init_target" != "" ] || exit_wrong_cmd
+    contains=$(contains_line "$init_script" $init_target)
+    if [ "$command" = "enable" ] && [ "$contains" = "no" ]; then
+        echo "${GREEN}Create init script for ${BOLD}$shell${NORMAL}"
+        add_line "$init_script" $init_target
+    fi
+    if [ "$command" = "disable" ] && [ "$contains" = "yes" ]; then
+        echo "${GREEN}Remove init script for ${BOLD}$shell${NORMAL}"
+        remove_line "$init_script" "$init_target"
+    fi
+
+    exit
+fi
+
+exit_wrong_cmd

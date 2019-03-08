@@ -1,0 +1,38 @@
+#! /bin/bash
+set -e
+
+case "$1" in
+        active)
+            detach rofi -show window -show-icons
+            ;;
+        all)
+            detach rofi -show combi -combi-modi drun,run -modi combi -show-icons
+            ;;
+        browser)
+            detach gnome-www-browser
+            ;;
+        email)
+            detach thunderbird -mail
+            ;;
+        player)
+            detach rhythmbox-client
+            ;;
+        calculator)
+            detach gnome-calculator
+            ;;
+        calendar)
+            detach gnome-calendar
+            ;;
+        home)
+            detach xdg-open ~
+            ;;
+        search)
+            detach gnome-open "http://google.com"
+            ;;
+        system-monitor)
+            detach gnome-system-monitor
+            ;;
+        *)
+            echo "Unexpected arg $0"
+            exit 1
+esac

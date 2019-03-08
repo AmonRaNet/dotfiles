@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for filename in $1
+do
+    [ -f "$filename" ] || continue
+    echo "Convert: $filename to 1024 px. New name: r-$filename"
+    convert $filename -resize 1024 r-$filename
+done

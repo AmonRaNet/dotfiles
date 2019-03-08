@@ -1,0 +1,6 @@
+[submodule "config/i3blocks/scripts"]
+	path = config/i3blocks/scripts
+	url = ../i3blocks-contrib
+[submodule "config/i3/scripts"]
+	path = config/i3/scripts
+	url = ../i3scripts

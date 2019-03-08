@@ -1,0 +1,156 @@
+#! /bin/bash
+set -e
+
+home="$(readlink -f ~)"
+display_mode_path=~/.screenlayout
+last_display_mode_path=~/.screenlayout
+last_display_mode_file=$last_display_mode_path/display_mode
+autolock_file=$last_display_mode_path/auto_lock
+mkdir -p $last_display_mode_path && touch $last_display_mode_file
+
+current_display_mode () {
+    local current=$(cat $last_display_mode_file)
+    if [ "$current" = "" ]; then
+       current=none
+    fi
+    echo $current
+}
+
+write_display_mode () {
+    if [  "$1" != "" ] && [ "$1" != "none" ]; then
+       echo "Save display mode: $1"
+       echo "$1" > $last_display_mode_file
+    fi
+}
+
+apply_display_mode () {
+    local current=$(current_display_mode)
+    if [ "$current" = "none" ]; then
+       echo "No display mode change"
+       notify-send "Display mode: no change"
+       return
+    fi
+    echo "Apply display mode: $current"
+    eval $current
+    detach bash -c "sleep 2 ; i3-msg restart"
+    notify-send "Display mode: $(basename -- $current)"
+}
+
+current_autolock_time () {
+    local time=$(cat $autolock_file)
+    if [ "$time" = "" ]; then
+       time=off
+    fi
+    echo $time
+}
+
+write_autolock_time () {
+    echo "Save auto-lock time: $1"
+    echo "$1" > $autolock_file
+}
+
+apply_autolock() {
+    local timer=$(current_autolock_time)
+    echo "Kill xautolock"
+    pkill xautolock || true
+    if [ "$timer" = "off" ]; then
+        notify-send -u critical "Auto-lock disabled"
+        return
+    fi
+    echo "Start xautolock for $timer min"
+    local notify_timer=10
+    xautolock -detectsleep \
+              -locker "i3-custom-lock" \
+              -time $timer \
+              -notify $notify_timer \
+              -notifier "notify-send -u critical -t ${notify_timer}000 -- 'Lock screen in $notify_timer sec'" &
+    notify-send -u critical "Auto-lock enabled (every $timer min)"
+}
+
+init_desktop_session() {
+    echo "Start gnome session"
+    detach gnome-settings-daemon
+    detach gnome-session
+}
+
+init_keyboard_layout() {
+    local layout="de,ru"
+    local toggle="alt_shift_toggle"
+    echo "Set keyboard layout $layout with $toggle"
+    setxkbmap -model pc105 -layout $layout -option grp:$toggle
+}
+
+init_compton() {
+    echo "Start compton"
+    compton -b --config=$home/.config/compton/compton.conf
+}
+
+init_persist_i3_scripts() {
+    echo "Start persist i3 scripts"
+    detach bash -c "sleep 2 ; python3 $home/.config/i3/scripts/autoname_workspaces.py"
+}
+
+case "$1" in
+        session-init)
+            init_desktop_session
+            init_keyboard_layout
+            init_compton
+            apply_display_mode
+            apply_autolock
+            init_persist_i3_scripts
+            ;;
+        display-switch)
+            current=$(current_display_mode)
+            found=0
+            for filename in $display_mode_path/*.sh; do
+                [ -f "$filename" ] || continue
+                if [ -z "$next_mode" ]; then
+                    next_mode=$filename
+                fi
+                if [ "$current" = "$filename" ]; then
+                   found=1
+                   continue
+                fi
+                if [ $found = 1 ]; then
+                   next_mode=$filename
+                   break
+                fi
+            done
+            write_display_mode $next_mode
+            apply_display_mode
+            ;;
+        display-menu)
+            list="Manually (arandr)"
+            for filename in $display_mode_path/*.sh; do
+                [ -f "$filename" ] || continue
+                list="${list}\n$(basename -- $filename) from $display_mode_path"
+            done
+            current=$(current_display_mode)
+            choice=$(basename -- $current)
+            choice=$(echo -e "$list" | rofi -i -dmenu -p "DisplayMode" -select $choice | awk '{print $1}')
+            if [ "$choice" = "" ]; then
+                exit 0
+            fi
+            if [ "$choice" = "Manually" ]; then
+                detach arandr
+            else
+                choice=$display_mode_path/$choice
+                write_display_mode $choice
+                apply_display_mode
+            fi
+            ;;
+        autolock)
+            list="off\n1\n2\n3\n5\n10\n15\n30\n60"
+            current=$(current_autolock_time)
+            choice=$(basename -- $current)
+            choice=$(echo -e "$list" | rofi -i -dmenu -p "AutoLock" -select $choice | awk '{print $1}')
+            if [ "$choice" = "" ]; then
+                exit 0
+            fi
+            write_autolock_time $choice
+            apply_autolock
+            ;;
+        *)
+            echo "Unexpected arg $0"
+            exit 1
+esac
