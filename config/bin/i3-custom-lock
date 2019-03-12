@@ -27,7 +27,7 @@ if ! mkdir $LOCKDIR 2>/dev/null; then
 fi
 echo "Create PID and background files"
 scrot $BACKGROUND
-notify-send -u critical "Display will be locked!"
+notify-send --icon=system-lock-screen -u critical Lock "Display will be locked!"
 convert $BACKGROUND -scale 5% -matte -channel a -evaluate set 50% -scale 2000% $BACKGROUND
 echo "Lock screen with locker"
 i3lock -e -n -f -c 272822 -i $BACKGROUND &

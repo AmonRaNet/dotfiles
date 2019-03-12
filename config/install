@@ -40,6 +40,9 @@ if app_exists "i3"; then
     if ! test_command "i3 --version | grep gaps"; then
         missing="$missing i3-gaps"
     fi
+    if ! test_command "ls /usr/share/notify-osd"; then
+        missing="$missing notify-osd"
+    fi
     dependencies=("dmenu" \
                   "i3lock" \
                   "i3status" \
@@ -83,6 +86,7 @@ if app_exists "i3"; then
     popd
 
     echo_install "i3 related python modules"
+    sudo bash -c "pip3 install setuptools"
     sudo bash -c "pip3 install i3ipc"
     sudo bash -c "pip3 install fontawesome"
 

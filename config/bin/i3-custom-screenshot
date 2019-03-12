@@ -9,6 +9,10 @@ app_exists() {
     return $result
 }
 
+notify () {
+    notify-send --icon=dialog-information Screenshot "$1"
+}
+
 # screenshot with Lightshot (over wine)
 if app_exists "wine"; then
     home="$(readlink -f ~)"
@@ -17,7 +21,7 @@ if app_exists "wine"; then
     for dir in "${lighshot_dir[@]}"; do
         if [ -d "$dir" ]; then
             detach wine "$dir/Lightshot.exe"
-            notify-send Screenshot "Lightshot open in system menu\nUse 'Take a screenshot'"
+            notify "Lightshot open in system menu\nUse 'Take a screenshot'"
             exit
         fi
     done
@@ -26,15 +30,15 @@ fi
 # sreenshot with kazam
 if app_exists "kazam"; then
     kazam
-    notify-send Screenshot "Screenshot in kazam"
+    notify "Screenshot in kazam"
     exit
 fi
 
 # sreenshot with scrot + gimp
 if app_exists "scrot" && app_exists "gimp"; then
     scrot -e 'mv $f /tmp/ && gimp /tmp/$f'
-    notify-send Screenshot "Screenshot in GIMP"
+    notify "Screenshot in GIMP"
     exit
 fi
 
-notify-send -u critical "No tools for screenshot!"
+notify "No tools for screenshot!"

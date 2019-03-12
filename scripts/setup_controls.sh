@@ -23,6 +23,7 @@ choice=($(whiptail \
   dmenu "application manager (default in i3)" off\
   kbdd "per window layout using XKB" off \
   xautolock "auto-lock tool" off \
+  notify-osd "notify daemon(i3)" off \
   compton "compositor for Xorg" off \
   sysstat "system statistic (like iostat)" off \
   atom "atom" off \
@@ -62,6 +63,7 @@ simple=("vim" \
         "kbdd" \
         "xautolock" \
         "compton" \
+        "notify-osd" \
         "sysstat" \
         "default-jre" \
         "default-jdk" \
@@ -184,11 +186,8 @@ fi
 
 if is_install "gdrive"; then
    echo_install "gdrive"
-   sudo add-apt-repository -y ppa:nilarimogard/webupd8
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install grive
-   wget -N -O /tmp/grive-tools.deb https://launchpad.net/~thefanclub/+archive/ubuntu/grive-tools/+files/grive-tools_1.15_all.deb
-   install_deb "/tmp/grive-tools.deb"
+   wget -N -O /tmp/grive-tools-all.deb https://github.com/AmonRaNet/grive-tools/releases/download/1.15/grive-tools_1.15-1_all.deb
+   install_deb "/tmp/grive-tools-all.deb"
    msg_dialog "Finish setup and exit setup application to continue!"
    /opt/thefanclub/grive-tools/grive-setup
 fi

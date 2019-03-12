@@ -13,7 +13,11 @@ source $DIR/config.sh
 qtcreator_version=4.8
 qtcreator_build=1
 qtcreator_spellcheck_version=2.0.1
-libhunspell_version=1.3
+if is_ubuntu18; then
+    libhunspell_version=1.6
+else
+    libhunspell_version=1.3
+fi
 
 set +e
 choice=($(whiptail \
