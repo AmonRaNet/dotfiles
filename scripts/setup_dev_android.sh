@@ -21,7 +21,7 @@ set -e
 
 if is_install "androidstudio"; then
    echo_install "androidstudio"
-   wget -N -O /tmp/android-studio.zip https://dl.google.com/dl/android/studio/ide-zips/3.2.1.0/android-studio-ide-181.5056338-linux.zip
+   wget -N -O /tmp/android-studio.zip https://dl.google.com/dl/android/studio/ide-zips/3.3.2.0/android-studio-ide-182.5314842-linux.zip
    sudo unzip /tmp/android-studio.zip -d /opt/android-studio
    sudo chmod +x /opt/android-studio/studio.sh
    sudo ln -s /opt/android-studio/studio.sh /usr/bin/android-studio
