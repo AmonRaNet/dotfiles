@@ -90,7 +90,7 @@ init_i3scripts() {
 
 user_session_start() {
     echo "Start gnome session"
-    gnome-session --session=ubuntu &
+    gnome-session &
     if [ -f /usr/lib/gnome-settings-daemon/gnome-settings-daemon ]; then
         echo "Start gnome-settings-daemon"
         gnome-settings-daemon &
