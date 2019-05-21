@@ -186,6 +186,11 @@ fi
 
 if is_install "gdrive"; then
    echo_install "gdrive"
+   if is_ubuntu18; then
+       sudo add-apt-repository -y ppa:nilarimogard/webupd8
+       sudo apt-get -q update
+       sudo apt-get --assume-yes --no-install-recommends install grive
+   fi
    wget -N -O /tmp/grive-tools-all.deb https://github.com/AmonRaNet/grive-tools/releases/download/1.15/grive-tools_1.15-1_all.deb
    install_deb "/tmp/grive-tools-all.deb"
    msg_dialog "Finish setup and exit setup application to continue!"
