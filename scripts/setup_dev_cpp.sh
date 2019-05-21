@@ -21,7 +21,7 @@ fi
 
 set +e
 choice=($(whiptail \
-  --checklist "C++ tools setup (AmonRaNet)" 20 80 9 \
+  --checklist "C++ tools setup (AmonRaNet)" 20 80 10 \
   cmake "cmake (latest release)" off \
   ninja "ninja" off \
   clang-6.0 "clang compiler" off \
@@ -31,6 +31,7 @@ choice=($(whiptail \
   qtframework "Qt framework" off \
   qtcreator "QtCreator v$qtcreator_version.$qtcreator_build" off \
   qtspellcheck "Qt spellCheck plugin v$qtcreator_spellcheck_version" off \
+  vcode "Visual Studio Code on Linux" off \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -105,4 +106,12 @@ if is_install "qtspellcheck"; then
        nohup xdg-open https://sourceforge.net/projects/wordlist/files/speller/2018.04.16/hunspell-en_US-2018.04.16.zip >/dev/null 2>&1
        msg_dialog "Please download dictionary, unpack and apply it in QtCreator (Menu->Tools->Options->Spell Checker)"
    fi
+fi
+
+if is_install "vcode"; then
+   echo_install "vcode"
+   wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+   sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+   sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install code
 fi
