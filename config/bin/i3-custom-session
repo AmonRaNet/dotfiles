@@ -7,6 +7,8 @@ last_display_mode_path=~/.screenlayout
 last_display_mode_file=$last_display_mode_path/display_mode
 autolock_file=$last_display_mode_path/auto_lock
 mkdir -p $last_display_mode_path && touch $last_display_mode_file
+i3_restart_delay=2
+i3_scripts_delay=3
 
 current_display_mode () {
     local current=$(cat $last_display_mode_file)
@@ -35,7 +37,7 @@ apply_display_mode () {
     echo "Apply display mode: $current"
     eval $current
     notify-send $notify_opt "Current mode: $(basename -- $current)"
-    sleep 2 && i3-msg restart &
+    sleep $i3_restart_delay && i3-msg restart &
 }
 
 current_autolock_time () {
@@ -72,7 +74,7 @@ apply_autolock() {
 }
 
 init_keyboard_layout() {
-    local layout="de,ru"
+    local layout="de,en_US,ru"
     local toggle="alt_shift_toggle"
     echo "Set keyboard layout $layout with $toggle"
     setxkbmap -model pc105 -layout $layout -option grp:$toggle
@@ -83,9 +85,9 @@ init_compton() {
     compton -b --config=$home/.config/compton/compton.conf
 }
 
-init_i3scripts() {
+run_i3scripts() {
     echo "Start i3 scripts"
-    sleep 2 && python3 $home/.config/i3/scripts/autoname_workspaces.py &
+    sleep $i3_scripts_delay && python3 $home/.config/i3/scripts/autoname_workspaces.py &
 }
 
 user_session_start() {
@@ -113,10 +115,10 @@ case "$1" in
         session)
             user_session_start
             init_compton
-            init_i3scripts
             init_keyboard_layout
             apply_display_mode
             apply_autolock
+            run_i3scripts
             ;;
         session-quit)
             user_session_quit

@@ -173,8 +173,8 @@ bindsym $mod+Shift+m bar mode toggle bar_monitor
 set $mode_system System (l) lock, (Shift+l) auto-lock, (e) logout, (s) suspend, (h) hibernate, (r) reboot, (Shift+s) shutdown
 mode "$mode_system" {
     bindsym l       exec --no-startup-id i3-custom-lock, mode "default"
-    bindsym Shift+l exec --no-startup-id i3-custom-settings autolock, mode "default"
-    bindsym e       exec --no-startup-id i3-custom-settings session-quit
+    bindsym Shift+l exec --no-startup-id i3-custom-session autolock, mode "default"
+    bindsym e       exec --no-startup-id i3-custom-session session-quit
     bindsym s       exec --no-startup-id i3-custom-power suspend, mode "default"
     bindsym h       exec --no-startup-id i3-custom-power hibernate, mode "default"
     bindsym r       exec --no-startup-id i3-custom-power reboot
@@ -222,8 +222,8 @@ bindsym $mod+Shift+0 move container to workspace number 10; workspace number 10
 bindsym Mod1+Tab          exec --no-startup-id i3-custom-applications active
 bindsym Mod1+space        exec --no-startup-id i3-custom-applications all
 bindsym $mod+Shift+Return exec --no-startup-id i3-custom-applications browser
-bindsym $mod+p            exec --no-startup-id i3-custom-settings display-menu
-bindsym $mod+Shift+p      exec --no-startup-id i3-custom-settings display-switch
+bindsym $mod+p            exec --no-startup-id i3-custom-session display-menu
+bindsym $mod+Shift+p      exec --no-startup-id i3-custom-session display-switch
 bindsym Print             exec --no-startup-id i3-custom-screenshot
 
 # Pulse Audio controls
@@ -248,7 +248,7 @@ bindsym XF86Calendar   exec --no-startup-id i3-custom-applications calendar
 bindsym XF86Mail       exec --no-startup-id i3-custom-applications email
 bindsym XF86HomePage   exec --no-startup-id i3-custom-applications home
 bindsym XF86Search     exec --no-startup-id i3-custom-applications search
-bindsym XF86Display    exec --no-startup-id i3-custom-settings display-menu
+bindsym XF86Display    exec --no-startup-id i3-custom-session display-menu
 bindsym XF86Sleep      exec --no-startup-id i3-custom-power suspend
 
 # i3 gaps settings and controls
@@ -315,4 +315,4 @@ for_window [class="(?i)arandr"] floating enable, sticky enable
 for_window [class="(?i)kazam"] floating enable
 
 # Exec by start
-exec --no-startup-id i3-custom-settings session
+exec --no-startup-id i3-custom-session session
