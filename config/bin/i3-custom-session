@@ -99,6 +99,7 @@ user_session_start() {
     else
         for filename in /usr/lib/gnome-settings-daemon/gsd-*; do
             [ -f "$filename" ] || continue
+            [[ $filename != *"gsd-locate-pointer"* ]] || continue
             echo "Start $filename"
             eval $filename &
         done
