@@ -74,10 +74,11 @@ apply_autolock() {
 }
 
 init_keyboard_layout() {
-    local layout="de,en_US,ru"
+    local layout="de,us,ru"
     local toggle="alt_shift_toggle"
     echo "Set keyboard layout $layout with $toggle"
     setxkbmap -model pc105 -layout $layout -option grp:$toggle
+    kbdd -n &
 }
 
 init_compton() {
