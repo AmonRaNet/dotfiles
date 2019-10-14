@@ -3,34 +3,37 @@
 BACKGROUND=/tmp/screen_locked-$(id -u).png
 LOCKDIR=/tmp/i3lock-$(id -u).lck
 PIDFILE=$LOCKDIR/pid
-CLEAN_NEEDED=1
 
 _finish() {
-    if [ $CLEAN_NEEDED = 1 ]; then
+    if [ ! -z "$CLEAN_NEEDED" ]; then
         echo "Clean PID file"
         rm -r $LOCKDIR
         rm -rf $BACKGROUND
     fi
+    if [ ! -z "$CHILD" ]; then
+        echo "Terminate locker"
+        kill -TERM "$CHILD" 2>/dev/null
+    fi
 }
 trap _finish EXIT
 
-_term() {
-    echo "Terminate locker"
-    kill -TERM "$CHILD" 2>/dev/null
-}
-trap _term SIGTERM
-
 if ! mkdir $LOCKDIR 2>/dev/null; then
-    CLEAN_NEEDED=0
-    echo "Already started"
-    exit
+    PID=$(cat $PIDFILE)
+    kill -0 "$PID"
+    if [ "$?" == 0 ]; then
+      echo "Already started"
+      exit
+    fi
 fi
+CLEAN_NEEDED=1
+
 echo "Create PID and background files"
 scrot $BACKGROUND
 notify-send --icon=system-lock-screen -u critical Lock "Display will be locked!"
 convert $BACKGROUND -scale 5% -matte -channel a -evaluate set 50% -scale 2000% $BACKGROUND
+
 echo "Lock screen with locker"
 i3lock -e -n -f -c 272822 -i $BACKGROUND &
 CHILD=$!
-echo "$CHILD" > $PIDFILE
-wait "$CHILD"
+echo $CHILD > $PIDFILE
+wait $CHILD
