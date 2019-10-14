@@ -1,5 +1,10 @@
 #! /bin/bash
 
+if [ "$(id -u)" == "0" ]; then
+   echo "This script must be run as non-root" 1>&2
+   exit 1
+fi
+
 # Use colors, but only if connected to a terminal, and that terminal
 # supports them.
 if which tput >/dev/null 2>&1; then
