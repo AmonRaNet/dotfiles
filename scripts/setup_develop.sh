@@ -4,7 +4,7 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo "DevKit: compilers, Qt, IDE"
+    echo "DevKit: compilers, SDK, IDE"
     exit
 fi
 
@@ -21,17 +21,21 @@ fi
 
 set +e
 choice=($(whiptail \
-  --checklist "C++ tools setup (AmonRaNet)" 20 80 10 \
+  --checklist "C++ tools setup (AmonRaNet)" 20 80 14 \
   cmake "cmake (latest release)" off \
   ninja "ninja" off \
-  clang-6.0 "clang compiler" off \
-  clang-format-6.0 "clang-format" off \
-  clang-tidy-6.0 "clang-format" off \
+  bazel "bazel" off \
+  clang-6.0 "clang compiler 6.0" off \
+  clang-format-6.0 "clang-format 6.0" off \
+  clang-tidy-6.0 "clang-tidy 6.0" off \
   ccache "ccache" off \
   qtframework "Qt framework" off \
   qtcreator "QtCreator v$qtcreator_version.$qtcreator_build" off \
   qtspellcheck "Qt spellCheck plugin v$qtcreator_spellcheck_version" off \
   vcode "Visual Studio Code on Linux" off \
+  pycharm "PyCharm" off \
+  androidstudio "Android Studio" off \
+  androidtools "Android commmand line tools" off \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -79,6 +83,14 @@ if is_install "cmake"; then
    build_in_docker $DIR/make_cmake.sh
 fi
 
+if is_install "bazel"; then
+   echo_install "bazel"
+   wget -q https://bazel.build/bazel-release.pub.gpg -O- | sudo apt-key add -
+   sudo add-apt-repository -y "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8"
+   sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install bazel
+fi
+
 if is_install "qtframework"; then
    echo_install "qtframework"
    wget -N -O /tmp/qt-x64-online.run http://ftp.fau.de/qtproject/official_releases/online_installers/qt-unified-linux-x64-online.run
@@ -114,4 +126,26 @@ if is_install "vcode"; then
    sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install code
+fi
+
+if is_install "pycharm"; then
+   echo_install "pycharm"
+   sudo snap install pycharm-community --classic
+fi
+
+if is_install "androidstudio"; then
+   echo_install "androidstudio"
+   wget -N -O /tmp/android-studio.zip https://dl.google.com/dl/android/studio/ide-zips/3.2.1.0/android-studio-ide-181.5056338-linux.zip
+   sudo unzip /tmp/android-studio.zip -d /opt/android-studio
+   sudo chmod +x /opt/android-studio/studio.sh
+   sudo ln -s /opt/android-studio/studio.sh /usr/bin/android-studio
+   sudo apt-get install libc6:i386 libncurses5:i386 libstdc++6:i386 lib32z1 libbz2-1.0:i386
+fi
+
+if is_install "androidtools"; then
+   echo_install "androidtools"
+   wget -N -O /tmp/android-sdktools.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
+   sudo unzip /tmp/android-sdktools.zip -d /opt/android-sdk
+   sudo ln -s /opt/android-sdk/tools/bin/sdkmanager /usr/bin/sdkmanager
+   sudo ln -s /opt/android-sdk/tools/bin/avdmanager /usr/bin/avdmanager
 fi
