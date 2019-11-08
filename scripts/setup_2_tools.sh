@@ -19,7 +19,7 @@ choice=($(whiptail \
   indicator-sound-switcher "sound sources" off \
   arandr "display manager" off \
   numlockx "numlock enabler" off \
-  yad "YAD (yet another dialog)" off \
+  yad "yet another dialog" off \
   dmenu "application manager (default in i3)" off\
   kbdd "per window layout using XKB" off \
   xautolock "auto-lock tool" off \
@@ -46,10 +46,11 @@ choice=($(whiptail \
   kazam "screencast and screenshot" off \
   variety "wallpaper manager" off \
   remmina "remote desktop client" off \
-  gdrive "GDrive client" off \
-  yandexdisk "Yandex Disk client" off \
-  dropbox "Dropbox client" off \
-  blueproximity "Bluetooth locker" off \
+  gdrive "gdrive client" off \
+  yandexdisk "yandex Disk client" off \
+  dropbox "dropbox client" off \
+  blueproximity "bluetooth locker" off \
+  zeal "offline docs" off \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -217,3 +218,12 @@ if is_install "dropbox"; then
    msg_dialog "Finish setup and exit setup application to continue!"
    dropbox start -i
 fi
+
+if is_install "zeal"; then
+   echo_install "zeal"
+   sudo apt-add-repository -y ppa:zeal-developers/ppa
+   sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install zeal
+fi
+
+sudo add-apt-repository ppa:zeal-developers/ppa
