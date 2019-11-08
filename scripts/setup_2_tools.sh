@@ -31,6 +31,7 @@ choice=($(whiptail \
   chrome "google-chrome" off \
   default-jre "java run time" off \
   default-jdk "java developmnet kit" off \
+  meld "meld diff" off \
   wine "windows emulator" off \
   gitkraken "git gui(not-free)" off \
   giteye "git gui(free)" off \
@@ -68,6 +69,7 @@ simple=("vim" \
         "sysstat" \
         "default-jre" \
         "default-jdk" \
+        "meld" \
         "scrot" \
         "glogg" \
         "thunar" \
