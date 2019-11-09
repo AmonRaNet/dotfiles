@@ -13,45 +13,45 @@ source $DIR/config.sh
 set +e
 choice=($(whiptail \
   --checklist "Utils setup (AmonRaNet)" 22 90 15 \
-  vim "vim" off \
-  rofi "window/application rofi" off \
-  gnome-tweak-tool "settings GNOME" off \
-  indicator-sound-switcher "sound sources" off \
-  arandr "display manager" off \
-  numlockx "numlock enabler" off \
-  yad "yet another dialog" off \
-  dmenu "application manager (default in i3)" off\
-  kbdd "per window layout using XKB" off \
-  xautolock "auto-lock tool" off \
-  notify-osd "notify daemon(i3)" off \
-  compton "compositor for Xorg" off \
-  sysstat "system statistic (like iostat)" off \
-  atom "atom" off \
-  atompackages "default atom packages (nuclide,build,lint,etc)" off \
-  chrome "google-chrome" off \
-  default-jre "java run time" off \
-  default-jdk "java developmnet kit" off \
-  meld "meld diff" off \
-  wine "windows emulator" off \
-  gitkraken "git gui(not-free)" off \
-  giteye "git gui(free)" off \
-  lightshot "screenshot manager(over wine)" off \
-  scrot "screenshot CLI" off \
-  glogg "log file viewer" off \
-  thunar "file manager" off \
-  caja "file manager(Mate)" off \
-  zim "desktop wiki" off \
-  keepassx "pass storage" off \
-  skype "skype" off \
-  slack "slack" off \
-  kazam "screencast and screenshot" off \
-  variety "wallpaper manager" off \
-  remmina "remote desktop client" off \
-  gdrive "gdrive client" off \
-  yandexdisk "yandex Disk client" off \
-  dropbox "dropbox client" off \
-  blueproximity "bluetooth locker" off \
-  zeal "offline docs" off \
+  $(install_target vim) \
+  $(install_target rofi) \
+  $(install_target gnome-tweak-tool) \
+  $(install_target indicator-sound-switcher) \
+  $(install_target arandr) \
+  $(install_target numlockx) \
+  $(install_target yad yet-another-dialog) \
+  $(install_target dmenu) \
+  $(install_target kbdd) \
+  $(install_target xautolock) \
+  $(install_target notify-osd) \
+  $(install_target compton xorg-compositor) \
+  $(install_target sysstat) \
+  $(install_target atom) \
+  $(install_target atompackages custom) \
+  $(install_target chrome) \
+  $(install_target default-jre) \
+  $(install_target default-jdk) \
+  $(install_target meld diff-tool) \
+  $(install_target wine) \
+  $(install_target gitkraken) \
+  $(install_target giteye) \
+  $(install_target lightshot screenshot-tool) \
+  $(install_target scrot screenshot-tool) \
+  $(install_target glogg log-reader) \
+  $(install_target thunar file-manager) \
+  $(install_target caja file-manager) \
+  $(install_target zim local-wiki) \
+  $(install_target keepassx) \
+  $(install_target skype) \
+  $(install_target slack) \
+  $(install_target kazam screenshot-tool) \
+  $(install_target variety) \
+  $(install_target remmina) \
+  $(install_target gdrive) \
+  $(install_target yandexdisk) \
+  $(install_target dropbox) \
+  $(install_target blueproximity) \
+  $(install_target zeal local-docs) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -81,13 +81,14 @@ simple=("vim" \
 for i in ${simple[@]}
 do
    if is_install "$i"; then
-       echo_install "$i"
+       echo_install $INSTALL_TARGET
        sudo apt-get --assume-yes --no-install-recommends install $i
+       target_done $INSTALL_TARGET
    fi
 done
 
 if is_install "rofi"; then
-   echo_install "rofi"
+   echo_install $INSTALL_TARGET
    sudo add-apt-repository -y ppa:jasonpleau/rofi
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install rofi
@@ -95,31 +96,35 @@ if is_install "rofi"; then
    git clone https://github.com/DaveDavenport/rofi-themes.git /tmp/rofi-themes
    sudo cp -vR /tmp/rofi-themes/User\ Themes/. /usr/share/rofi/themes/
    rofi-theme-selector
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "indicator-sound-switcher"; then
-   echo_install "indicator-sound-switcher"
+   echo_install $INSTALL_TARGET
    sudo add-apt-repository -y ppa:yktooo/ppa
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install indicator-sound-switcher
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "chrome"; then
-   echo_install "chrome"
+   echo_install $INSTALL_TARGET
    wget -q -O - https://dl-ssl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
    sudo apt-get -q update
    sudo apt-get install google-chrome-stable
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "atom"; then
-   echo_install "atom"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/atom-amd64.deb https://github.com/atom/atom/releases/download/v1.32.2/atom-amd64.deb
    install_deb "/tmp/atom-amd64.deb"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "atompackages"; then
-   echo_install "atompackages"
+   echo_install $INSTALL_TARGET
    apm install nuclide
    apm install language-cpp14
    apm install language-cmake
@@ -132,63 +137,72 @@ if is_install "atompackages"; then
    apm install sublime-style-column-selection
    sudo pip3 install pycodestyle
    sudo pip3 install flake8
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "wine"; then
-   echo_install "wine"
+   echo_install $INSTALL_TARGET
    sudo dpkg --add-architecture i386
    wget -q -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
    sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install winehq-stable
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "gitkraken"; then
-   echo_install "gitkraken"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/gitkraken-amd64.deb https://release.gitkraken.com/linux/gitkraken-amd64.deb
    install_deb "/tmp/gitkraken-amd64.deb"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "giteye"; then
-   echo_install "giteye"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/giteye-x64.zip https://www.collab.net/sites/default/files/downloads/GitEye-2.1.0-linux.x86_64.zip
    sudo unzip /tmp/giteye-x64.zip -d /opt/giteye
    sudo ln -s /opt/giteye/GitEye /usr/bin/giteye
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "lightshot"; then
-   echo_install "lightshot"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/setup-lightshot.exe https://app.prntscr.com/build/setup-lightshot.exe
    wine /tmp/setup-lightshot.exe
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "skype"; then
-   echo_install "skype"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/skypeforlinux-x64.deb https://repo.skype.com/latest/skypeforlinux-64.deb
    install_deb "/tmp/skypeforlinux-x64.deb"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "slack"; then
-   echo_install "slack"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/slack-amd64.deb https://downloads.slack-edge.com/linux_releases/slack-desktop-3.3.3-amd64.deb
    install_deb "/tmp/slack-amd64.deb"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "remmina"; then
-   echo_install "remmina"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install remmina
    sudo apt-get --assume-yes --no-install-recommends install remmina-plugin-rdp
    sudo apt-get --assume-yes --no-install-recommends install libfreerdp-plugins-standard
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "variety"; then
-   echo_install "variety"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install variety
    sudo apt-get --assume-yes --no-install-recommends install feh
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "gdrive"; then
-   echo_install "gdrive"
+   echo_install $INSTALL_TARGET
    if is_ubuntu18; then
        sudo add-apt-repository -y ppa:nilarimogard/webupd8
        sudo apt-get -q update
@@ -198,10 +212,11 @@ if is_install "gdrive"; then
    install_deb "/tmp/grive-tools-all.deb"
    msg_dialog "Finish setup and exit setup application to continue!"
    /opt/thefanclub/grive-tools/grive-setup
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "yandexdisk"; then
-   echo_install "yandexdisk"
+   echo_install $INSTALL_TARGET
    sudo sh -c 'echo "deb http://repo.yandex.ru/yandex-disk/deb/ stable main" > /etc/apt/sources.list.d/yandex-disk.list'
    wget http://repo.yandex.ru/yandex-disk/YANDEX-DISK-KEY.GPG -O- | sudo apt-key add -
    sudo apt-get -q update
@@ -211,21 +226,22 @@ if is_install "yandexdisk"; then
    sudo apt-get --assume-yes --no-install-recommends install yd-tools
    msg_dialog "Finish setup and exit setup application to continue!"
    yandex-disk-indicator
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "dropbox"; then
-   echo_install "dropbox"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/dropbox_amd64.deb https://www.dropbox.com/download?dl=packages/ubuntu/dropbox_2018.11.28_amd64.deb
    install_deb "/tmp/dropbox_amd64.deb"
    msg_dialog "Finish setup and exit setup application to continue!"
    dropbox start -i
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "zeal"; then
-   echo_install "zeal"
+   echo_install $INSTALL_TARGET
    sudo apt-add-repository -y ppa:zeal-developers/ppa
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install zeal
+   target_done $INSTALL_TARGET
 fi
-
-sudo add-apt-repository ppa:zeal-developers/ppa

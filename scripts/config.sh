@@ -36,14 +36,41 @@ echo_install() {
     echo "${BLUE}==========================================================${NORMAL}"
 }
 
+INSTALL_TARGET=""
+EXPECTED_INSTALL_FILE="$HOME/.config/setup-expected.conf"
+
+install_target() {
+   set +e
+   grep -Fxq "$1" "$EXPECTED_INSTALL_FILE" > /dev/null
+   local result=$?
+   set -e
+   local target="$1"
+   local description="$2"
+   if [ "$description" = "" ]; then
+      description="$1"
+   fi
+   if [ $result = 0 ]; then
+      echo "$target $description on"
+      return 0
+   fi
+   echo "$target $description off"
+   return 1
+}
+
+target_done() {
+   sed -i '/'"$1"'/d' "$EXPECTED_INSTALL_FILE"
+}
+
 is_install() {
    local i
    for i in "${choice[@]}"
    do
      if [ "$i" = "$1" ] || [ "$i" = "\"$1\"" ]; then
+        INSTALL_TARGET="$1"
         return
      fi
    done
+   INSTALL_TARGET=""
    return 1
 }
 
