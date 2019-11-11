@@ -4,7 +4,7 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
-    echo "Utils: git, vim, atom, java, wine, etc"
+    echo "Tools: editors, display, managers, vm, etc"
     exit
 fi
 
@@ -26,8 +26,6 @@ choice=($(whiptail \
   $(install_target notify-osd) \
   $(install_target compton xorg-compositor) \
   $(install_target sysstat) \
-  $(install_target atom) \
-  $(install_target atompackages custom) \
   $(install_target chrome) \
   $(install_target default-jre) \
   $(install_target default-jdk) \
@@ -72,7 +70,6 @@ simple=("vim" \
         "meld" \
         "scrot" \
         "glogg" \
-        "thunar" \
         "caja" \
         "zim" \
         "keepassx" \
@@ -113,30 +110,6 @@ if is_install "chrome"; then
    echo 'deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main' | sudo tee /etc/apt/sources.list.d/google-chrome.list
    sudo apt-get -q update
    sudo apt-get install google-chrome-stable
-   target_done $INSTALL_TARGET
-fi
-
-if is_install "atom"; then
-   echo_install $INSTALL_TARGET
-   wget -N -O /tmp/atom-amd64.deb https://github.com/atom/atom/releases/download/v1.32.2/atom-amd64.deb
-   install_deb "/tmp/atom-amd64.deb"
-   target_done $INSTALL_TARGET
-fi
-
-if is_install "atompackages"; then
-   echo_install $INSTALL_TARGET
-   apm install nuclide
-   apm install language-cpp14
-   apm install language-cmake
-   apm install language-qtpro
-   apm install autocomplete-cmake
-   apm install autocomplete-clang
-   apm install linter-ui-default
-   apm install build-cmake
-   apm install build-python
-   apm install sublime-style-column-selection
-   sudo pip3 install pycodestyle
-   sudo pip3 install flake8
    target_done $INSTALL_TARGET
 fi
 
@@ -198,6 +171,13 @@ if is_install "variety"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install variety
    sudo apt-get --assume-yes --no-install-recommends install feh
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "thunar"; then
+   echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install thunar
+   sudo apt-get --assume-yes --no-install-recommends install gnome-icon-theme
    target_done $INSTALL_TARGET
 fi
 

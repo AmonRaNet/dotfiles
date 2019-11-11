@@ -48,7 +48,7 @@ do
    [ -f "$filename" ] || continue
    shortname=$(basename -- "$filename")
    if is_install "$shortname"; then
-       echo_install "$shortname"
+       echo_install "Run $shortname"
        eval "$DIR/$shortname"
    fi
 done

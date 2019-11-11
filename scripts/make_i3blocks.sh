@@ -4,7 +4,7 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$1" = "build" ]; then
-    depends="git ca-certificates build-essential autoconf automake checkinstall"
+    depends="git ca-certificates build-essential pkg-config autoconf automake checkinstall"
     apt-get update
     apt-get --assume-yes --no-install-recommends install $depends
     git clone https://github.com/vivien/i3blocks

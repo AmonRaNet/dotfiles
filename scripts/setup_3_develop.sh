@@ -33,6 +33,8 @@ choice=($(whiptail \
   $(install_target qtcreator $qtcreator_version) \
   $(install_target qtspellcheck $qtcreator_spellcheck_version) \
   $(install_target code visual-studio-code) \
+  $(install_target atom) \
+  $(install_target atompackages custom) \
   $(install_target pycharm) \
   $(install_target androidstudio) \
   $(install_target androidtools) \
@@ -136,6 +138,30 @@ if is_install "code"; then
    sudo add-apt-repository -y "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install code
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "atom"; then
+   echo_install $INSTALL_TARGET
+   wget -N -O /tmp/atom-amd64.deb https://github.com/atom/atom/releases/download/v1.32.2/atom-amd64.deb
+   install_deb "/tmp/atom-amd64.deb"
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "atompackages"; then
+   echo_install $INSTALL_TARGET
+   apm install nuclide || true
+   apm install language-cpp14
+   apm install language-cmake
+   apm install language-qtpro
+   apm install autocomplete-cmake
+   apm install autocomplete-clang
+   apm install linter-ui-default
+   apm install build-cmake
+   apm install build-python
+   apm install sublime-style-column-selection
+   sudo pip3 install pycodestyle
+   sudo pip3 install flake8
    target_done $INSTALL_TARGET
 fi
 

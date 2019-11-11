@@ -45,7 +45,12 @@ if is_install "docker"; then
    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
    sudo apt-get update
    sudo apt-get --assume-yes --no-install-recommends --allow-unauthenticated install docker-ce
-   sudo usermod -a -G docker $USER
+   if [[ "$(groups)" != *"docker"* ]]; then
+        sudo usermod -a -G docker $USER
+        msg_dialog "User added to docker group. Please logout and login again to continue"
+        target_done $INSTALL_TARGET
+        exit 1
+   fi
    target_done $INSTALL_TARGET
 fi
 
