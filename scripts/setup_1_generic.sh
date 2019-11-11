@@ -12,68 +12,79 @@ source $DIR/config.sh
 
 set +e
 choice=($(whiptail \
-  --checklist "General tools setup (AmonRaNet)" 20 80 9 \
-  python "python" off \
-  docker "docker" off \
-  i3 "i3 window manager and basic i3 tools" off \
-  i3bloks "extention for i3 bar" off \
-  i3gaps "custom i3 edition with gaps support" off \
-  terminator "terminator terminal" off \
-  awesome-fonts "awesome-fonts" off \
-  powerline-fonts "powerline-fonts" off \
-  fish-shell "fish shell" off \
-  zsh-shell "zsh shell" off \
-  fzf "fuzzy finder" off \
+  --checklist "General tools setup (AmonRaNet)" 20 80 15 \
+  $(install_target python) \
+  $(install_target docker) \
+  $(install_target i3) \
+  $(install_target i3bloks) \
+  $(install_target i3gaps) \
+  $(install_target terminator) \
+  $(install_target awesome-fonts) \
+  $(install_target powerline-fonts) \
+  $(install_target fish-shell) \
+  $(install_target zsh-shell) \
+  $(install_target fzf fuzzy-finder) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
 
 if is_install "python"; then
-   echo_install "python"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install python
    sudo apt-get --assume-yes --no-install-recommends install python3
    sudo apt-get --assume-yes --no-install-recommends install python-pip
    sudo apt-get --assume-yes --no-install-recommends install python3-pip
    sudo bash -c "pip install --upgrade pip"
    sudo bash -c "pip3 install --upgrade pip"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "docker"; then
-   echo_install "docker"
+   echo_install $INSTALL_TARGET
    wget -q -O - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
    sudo apt-get update
    sudo apt-get --assume-yes --no-install-recommends --allow-unauthenticated install docker-ce
-   sudo usermod -a -G docker $USER
+   if [[ "$(groups)" != *"docker"* ]]; then
+        sudo usermod -a -G docker $USER
+        msg_dialog "User added to docker group. Please logout and login again to continue"
+        target_done $INSTALL_TARGET
+        exit 1
+   fi
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "i3"; then
-   echo_install "i3"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install i3
    sudo apt-get --assume-yes --no-install-recommends install i3status
    sudo apt-get --assume-yes --no-install-recommends install i3lock
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "i3gaps"; then
-   echo_install "i3gaps"
+   echo_install $INSTALL_TARGET
    build_in_docker $DIR/make_i3gaps.sh
    sudo apt-get --assume-yes --no-install-recommends install i3status
    sudo apt-get --assume-yes --no-install-recommends install i3lock
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "i3bloks"; then
-   echo_install "i3bloks"
+   echo_install $INSTALL_TARGET
    build_in_docker $DIR/make_i3blocks.sh
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "terminator"; then
-   echo_install "terminator"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install terminator
    sudo gsettings set org.gnome.desktop.default-applications.terminal exec '/usr/bin/terminator'
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "awesome-fonts"; then
-   echo_install "awesome-fonts"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install fonts-font-awesome
    wget -N -O /tmp/awesome-fonts.zip https://use.fontawesome.com/releases/v5.5.0/fontawesome-free-5.5.0-desktop.zip
    unzip -o /tmp/awesome-fonts.zip 'fontawesome-free-5.5.0-desktop/otfs/*' -d /tmp/awesome-fonts
@@ -81,17 +92,19 @@ if is_install "awesome-fonts"; then
    sudo mkdir -p $font_dir
    sudo cp -vR /tmp/awesome-fonts/fontawesome-free-5.5.0-desktop/otfs/* $font_dir
    sudo fc-cache -f "$font_dir"
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "powerline-fonts"; then
-   echo_install "powerline-fonts"
+   echo_install $INSTALL_TARGET
    wget -N -O /tmp/powerline-fonts.zip https://codeload.github.com/powerline/fonts/zip/master
    unzip -o /tmp/powerline-fonts.zip -d /tmp/powerline-fonts
    bash /tmp/powerline-fonts/fonts-master/install.sh
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "fish-shell"; then
-   echo_install "fish-shell"
+   echo_install $INSTALL_TARGET
    #clean
    sudo rm -rf ~/.local/share/omf
    sudo rm -rf ~/.config/omf
@@ -124,10 +137,11 @@ set -g theme_display_git_master_branch yes
 set -g theme_display_docker_machine yes
 set -g theme_display_virtualenv yes
 "
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "zsh-shell"; then
-   echo_install "zsh-shell"
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install zsh
    if yesno_dialog "zsh as default shell?"; then
        sudo echo /usr/bin/zsh | sudo tee -a /etc/shells
@@ -175,12 +189,14 @@ zsh-autosuggestions)"
 export ZSH=\"$ZSH\"
 export ZSH_CUSTOM=\"$ZSH_CUSTOM\"
 source \"$ZSH/oh-my-zsh.sh\""
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "fzf"; then
-   echo_install "fzf"
+   echo_install $INSTALL_TARGET
    target=~/.fzf
    rm -rf $target
    git clone --depth 1 https://github.com/junegunn/fzf.git $target
    $target/install
+   target_done $INSTALL_TARGET
 fi
