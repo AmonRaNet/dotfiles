@@ -105,6 +105,9 @@ if is_install "qtframework"; then
    wget -N -O /tmp/qt-x64-online.run http://ftp.fau.de/qtproject/official_releases/online_installers/qt-unified-linux-x64-online.run
    sudo chmod +x /tmp/qt-x64-online.run
    /tmp/qt-x64-online.run
+   if yesno_dialog "Install libgl-meaa?"; then
+       sudo apt-get --assume-yes --no-install-recommends install libgl1-mesa-dev
+   fi
    target_done $INSTALL_TARGET
 fi
 
