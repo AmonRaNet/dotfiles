@@ -313,6 +313,7 @@ for_window [class="(?i)keepassx"] floating enable, sticky enable
 for_window [class="(?i)gnome-system-monitor"] floating enable, sticky enable
 for_window [class="(?i)arandr"] floating enable, sticky enable
 for_window [class="(?i)kazam"] floating enable
+for_window [class="(?i)zeal"] floating enable
 
 # Exec by start
 exec --no-startup-id i3-custom-session session
