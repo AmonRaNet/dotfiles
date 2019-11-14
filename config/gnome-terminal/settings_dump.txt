@@ -1,0 +1,37 @@
+[legacy/profiles:/:ff7539e6-465d-4744-a19f-d0ec5f39fa4f]
+foreground-color='rgb(247,250,245)'
+visible-name='zsh'
+palette=['rgb(0,0,0)', 'rgb(205,0,0)', 'rgb(0,205,0)', 'rgb(205,205,0)', 'rgb(0,0,238)', 'rgb(205,0,205)', 'rgb(0,205,205)', 'rgb(229,229,229)', 'rgb(127,127,127)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(92,92,255)', 'rgb(255,0,255)', 'rgb(0,255,255)', 'rgb(255,255,255)']
+bold-is-bright=true
+custom-command='zsh'
+use-system-font=false
+use-custom-command=true
+use-theme-colors=false
+font='Meslo LG L for Powerline 9'
+scrollback-unlimited=true
+background-color='rgb(46,52,54)'
+
+[legacy/profiles:/:715f1ae5-0ab3-4b68-ac10-0cebdba81039]
+foreground-color='rgb(247,250,245)'
+visible-name='fish'
+palette=['rgb(0,0,0)', 'rgb(205,0,0)', 'rgb(0,205,0)', 'rgb(205,205,0)', 'rgb(0,0,238)', 'rgb(205,0,205)', 'rgb(0,205,205)', 'rgb(229,229,229)', 'rgb(127,127,127)', 'rgb(255,0,0)', 'rgb(0,255,0)', 'rgb(255,255,0)', 'rgb(92,92,255)', 'rgb(255,0,255)', 'rgb(0,255,255)', 'rgb(255,255,255)']
+bold-is-bright=true
+custom-command='fish'
+use-system-font=false
+use-custom-command=true
+use-theme-colors=false
+font='Meslo LG L for Powerline 9'
+scrollback-unlimited=true
+background-color='rgb(46,52,54)'
+
+[legacy/profiles:/:b1dcc9dd-5262-4d8d-a863-c897e6d979b9]
+visible-name='default'
+
+[legacy/profiles:]
+list=['b1dcc9dd-5262-4d8d-a863-c897e6d979b9', '715f1ae5-0ab3-4b68-ac10-0cebdba81039', 'ff7539e6-465d-4744-a19f-d0ec5f39fa4f']
+default='715f1ae5-0ab3-4b68-ac10-0cebdba81039'
+
+[legacy]
+schema-version=uint32 3
+theme-variant='dark'
+default-show-menubar=false

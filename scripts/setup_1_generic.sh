@@ -19,6 +19,7 @@ choice=($(whiptail \
   $(install_target i3bloks) \
   $(install_target i3gaps) \
   $(install_target terminator) \
+  $(install_target gnome-terminal) \
   $(install_target awesome-fonts) \
   $(install_target powerline-fonts) \
   $(install_target fish-shell) \
@@ -27,6 +28,20 @@ choice=($(whiptail \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
+
+set_default_terminal() {
+  TERMINAL=$(which $1)
+  sudo gsettings set org.gnome.desktop.default-applications.terminal exec ''$TERMINAL''
+  sudo gsettings set org.gnome.desktop.default-applications.terminal exec-arg ''
+  sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator $TERMINAL 0
+  sudo update-alternatives --set x-terminal-emulator $TERMINAL
+}
+
+set_default_shell() {
+  SHELL=$(which $1)
+  sudo echo $SHELL | sudo tee -a /etc/shells
+  sudo chsh -s $SHELL
+}
 
 if is_install "python"; then
    echo_install $INSTALL_TARGET
@@ -79,7 +94,18 @@ fi
 if is_install "terminator"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install terminator
-   sudo gsettings set org.gnome.desktop.default-applications.terminal exec '/usr/bin/terminator'
+   if yesno_dialog "$INSTALL_TARGET as default?"; then
+       set_default_terminal terminator
+   fi
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "gnome-terminal"; then
+   echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install gnome-terminal
+   if yesno_dialog "$INSTALL_TARGET as default?"; then
+     set_default_terminal gnome-terminal
+   fi
    target_done $INSTALL_TARGET
 fi
 
@@ -114,9 +140,8 @@ if is_install "fish-shell"; then
    sudo apt-add-repository -y ppa:fish-shell/release-2
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install fish fish-common
-   if yesno_dialog "fish as default shell?"; then
-       sudo echo /usr/bin/fish | sudo tee -a /etc/shells
-       sudo chsh -s /usr/bin/fish
+   if yesno_dialog "$INSTALL_TARGET as default?"; then
+       set_default_shell fish
    fi
    fish -c "echo 'Create fish config'"
    source-auto enable fish
@@ -143,9 +168,8 @@ fi
 if is_install "zsh-shell"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install zsh
-   if yesno_dialog "zsh as default shell?"; then
-       sudo echo /usr/bin/zsh | sudo tee -a /etc/shells
-       sudo chsh -s /usr/bin/zsh
+   if yesno_dialog "$INSTALL_TARGET as default?"; then
+     set_default_shell zsh
    fi
    #oh-my-z
    ZSH=${ZSH:-~/.oh-my-zsh}
