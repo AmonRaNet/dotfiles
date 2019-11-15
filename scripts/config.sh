@@ -36,6 +36,10 @@ echo_install() {
     echo "${BLUE}==========================================================${NORMAL}"
 }
 
+echo_task() {
+    echo "${GREEN}${BOLD}--->${NORMAL}$1"
+}
+
 INSTALL_TARGET=""
 EXPECTED_INSTALL_FILE="$HOME/.config/setup-expected.conf"
 

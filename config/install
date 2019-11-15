@@ -14,11 +14,26 @@ source $DIR/../scripts/config.sh
 validate_missing_init() {
     missing=
 }
+
 validate_missing_apply() {
     if [ ! -z "$missing" ]; then
         msg_dialog "Missing generally: $missing"
         exit 1
     fi
+}
+
+copy_config() {
+    CONFIG=$1
+    sudo rm -vfR ~/.config/$CONFIG/*
+    cp -vR $DIR/$CONFIG ~/.config/
+}
+
+mark_done() {
+    echo "${GREEN}DONE${NORMAL}"
+}
+
+mark_skipped() {
+    echo "${RED}SKIPPED${NORMAL}"
 }
 
 echo_install "validate"
@@ -30,12 +45,15 @@ if ! test_command "ls ~/.local/share/fonts/*Powerline*"; then
     missing="$missing font-powerline"
 fi
 validate_missing_apply
+mark_done
 
-echo_install "install basic tools"
+echo_install "install basic-tools"
 sudo cp -vR $DIR/bin/detach /usr/bin
 sudo cp -vR $DIR/bin/resize-images /usr/bin
+mark_done
 
 if app_exists "i3"; then
+    echo_install "i3 config"
     validate_missing_init
     if ! test_command "i3 --version | grep gaps"; then
         missing="$missing i3-gaps"
@@ -65,53 +83,57 @@ if app_exists "i3"; then
     done
     validate_missing_apply
 
-    echo_install "submodules"
     git submodule init
+    echo_task "i3 submodules"
     git submodule update
 
-    echo_install "i3 custom scripts"
+    echo_task "i3 custom scripts"
     sudo rm -vfR /usr/bin/i3-custom-*
     sudo cp -vR $DIR/bin/i3-custom-* /usr/bin
 
-    echo_install "i3 config"
-    sudo rm -vfR ~/.config/i3/*
-    cp -vR $DIR/i3 ~/.config/
+    echo_task "i3 config"
+    copy_config i3
 
-    echo_install "i3blocks config"
-    sudo rm -vfR ~/.config/i3blocks/*
-    cp -vR $DIR/i3blocks ~/.config/
-    pushd .
-    cd ~/.config/i3blocks/scripts/bandwidth2
-    make
-    popd
+    echo_task "i3blocks config"
+    copy_config i3blocks
+    (cd ~/.config/i3blocks/scripts/bandwidth2 ; make)
 
-    echo_install "i3 related python modules"
+    echo_task "i3 related python modules"
     sudo bash -c "pip3 install setuptools"
     sudo bash -c "pip3 install i3ipc"
     sudo bash -c "pip3 install fontawesome"
 
-    echo_install "compton config"
-    sudo rm -vfR ~/.config/compton/*
-    cp -vR $DIR/compton ~/.config/
+    echo_task "compton config"
+    copy_config compton
+
+    mark_done
 else
-    echo "${RED}i3 is skipped!${NORMAL}"
+    mark_skipped
 fi
 
 if app_exists "terminator"; then
     echo_install "terminator config"
-    sudo rm -vfR ~/.config/terminator/*
-    cp -vR $DIR/terminator ~/.config/
+    copy_config terminator
+    mark_done
 else
-    echo "${RED}terminator is skipped!${NORMAL}"
+    mark_skipped
 fi
 
 if app_exists "gnome-terminal"; then
     echo_install "gnome-terminal config"
-    echo "reset & write config"
     dconf reset -f /org/gnome/terminal/
     dconf load /org/gnome/terminal/ < $DIR/gnome-terminal/settings_dump.txt
+    mark_done
 else
-    echo "${RED}gnome-terminal is skipped!${NORMAL}"
+    mark_skipped
+fi
+
+if app_exists "variety"; then
+    echo_install "variety config"
+    copy_config variety
+    mark_done
+else
+    mark_skipped
 fi
 
 if app_exists "fish"; then
@@ -136,6 +158,7 @@ set fish_pager_color_prefix brred
 set fish_pager_color_completion normal
 set fish_pager_color_description brgrey
 set fish_pager_color_progress magenta"
+    mark_done
 else
-    echo "${RED}fish is skipped!${NORMAL}"
+    mark_skipped
 fi
