@@ -30,7 +30,7 @@ no_choice_exit
 set -e
 
 set_default_terminal() {
-  TERMINAL=$(which $1)
+  local TERMINAL=$(which $1)
   sudo gsettings set org.gnome.desktop.default-applications.terminal exec ''$TERMINAL''
   sudo gsettings set org.gnome.desktop.default-applications.terminal exec-arg ''
   sudo update-alternatives --install /usr/bin/x-terminal-emulator x-terminal-emulator $TERMINAL 0
@@ -38,7 +38,7 @@ set_default_terminal() {
 }
 
 set_default_shell() {
-  SHELL=$(which $1)
+  local SHELL=$(which $1)
   sudo echo $SHELL | sudo tee -a /etc/shells
   sudo chsh -s $SHELL
 }
