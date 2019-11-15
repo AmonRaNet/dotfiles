@@ -1,6 +1,14 @@
 #! /bin/bash
 set -e
 
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    echo "Take screenshot"
+    echo "---------------------"
+    echo "Usage: $THIS"
+    exit
+fi
+
 app_exists() {
     set +e
     command -v $1 > /dev/null

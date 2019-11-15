@@ -1,4 +1,13 @@
 #! /bin/bash
+set -e
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    echo "Screen lock"
+    echo "---------------------"
+    echo "Usage: $THIS"
+    exit
+fi
 
 BACKGROUND=/tmp/screen_locked-$(id -u).png
 LOCKDIR=/tmp/i3lock-$(id -u).lck

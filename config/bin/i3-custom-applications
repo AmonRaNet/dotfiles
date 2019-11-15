@@ -1,11 +1,23 @@
 #! /bin/bash
 set -e
 
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    ACTIONS=$(grep -E -o "\s+[a-zA-Z\-]+\)" $THIS)
+    ACTIONS=$(echo "$ACTIONS" | sed -e 's/[\*\)]//g')
+    echo "Run application action"
+    echo "---------------------"
+    echo "Usage: $THIS <action>"
+    echo "where action:"
+    echo "$ACTIONS"
+    exit
+fi
+
 case "$1" in
-        active)
+        select-active)
             detach rofi -show window -show-icons
             ;;
-        all)
+        select-any)
             detach rofi -show combi -combi-modi drun,run -modi combi -show-icons
             ;;
         browser)
@@ -31,6 +43,42 @@ case "$1" in
             ;;
         system-monitor)
             detach gnome-system-monitor
+            ;;
+        backlight-up)
+            xbacklight -inc 20
+            ;;
+        backlight-down)
+            xbacklight -dec 20
+            ;;
+        audio-volume-up)
+            pactl set-sink-volume @DEFAULT_SINK@ +5%
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        audio-volume-down)
+            pactl set-sink-volume @DEFAULT_SINK@ -5%
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        audio-volume-mute)
+            pactl set-sink-mute @DEFAULT_SINK@ toggle
+            exec pkill -SIGRTMIN+10 i3blocks
+            ;;
+        audio-play)
+            set +e
+            if ! rhythmbox-client --check-running; then
+                detach rhythmbox-client --play-uri=http://ubuntu.hbr1.com:19800/trance.ogg
+                exit
+            fi
+            set -e
+            rhythmbox-client --play-pause
+            ;;
+        audio-pause)
+            rhythmbox-client --play-pause
+            ;;
+        audio-next)
+            rhythmbox-client --next
+            ;;
+        audio-prev)
+            rhythmbox-client --previous
             ;;
         *)
             echo "Unexpected arg $0"

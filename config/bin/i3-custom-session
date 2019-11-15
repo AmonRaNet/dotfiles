@@ -1,6 +1,18 @@
 #! /bin/bash
 set -e
 
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    ACTIONS=$(grep -E -o "\s+[a-zA-Z\-]+\)" $THIS)
+    ACTIONS=$(echo "$ACTIONS" | sed -e 's/[\*\)]//g')
+    echo "Run user session action"
+    echo "---------------------"
+    echo "Usage: $THIS <action>"
+    echo "where action:"
+    echo "$ACTIONS"
+    exit
+fi
+
 home="$(readlink -f ~)"
 display_mode_path=~/.screenlayout
 last_display_mode_path=~/.screenlayout
@@ -70,7 +82,7 @@ apply_autolock() {
               -time "$lock_timer" \
               -notify "$notify_timer" \
               -notifier "$notify_app" &
-    notify-send $notify_opt "Auto-lock enabled (every $lock_timer min)"
+    notify-send $notify_opt "Auto-lock enabled, every $lock_timer min"
 }
 
 init_keyboard_layout() {

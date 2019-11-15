@@ -219,27 +219,27 @@ bindsym $mod+Shift+9 move container to workspace number 9; workspace number 9
 bindsym $mod+Shift+0 move container to workspace number 10; workspace number 10
 
 # Custom applications
-bindsym Mod1+Tab          exec --no-startup-id i3-custom-applications active
-bindsym Mod1+space        exec --no-startup-id i3-custom-applications all
+bindsym Mod1+Tab          exec --no-startup-id i3-custom-applications select-active
+bindsym Mod1+space        exec --no-startup-id i3-custom-applications select-any
 bindsym $mod+Shift+Return exec --no-startup-id i3-custom-applications browser
 bindsym $mod+p            exec --no-startup-id i3-custom-session display-menu
 bindsym $mod+Shift+p      exec --no-startup-id i3-custom-session display-switch
 bindsym Print             exec --no-startup-id i3-custom-screenshot
 
 # Pulse Audio controls
-bindsym XF86AudioRaiseVolume exec --no-startup-id i3-custom-buttons volume-up
-bindsym XF86AudioLowerVolume exec --no-startup-id i3-custom-buttons volume-down
-bindsym XF86AudioMute        exec --no-startup-id i3-custom-buttons volume-mute
+bindsym XF86AudioRaiseVolume exec --no-startup-id i3-custom-applications audio-volume-up
+bindsym XF86AudioLowerVolume exec --no-startup-id i3-custom-applications audio-volume-down
+bindsym XF86AudioMute        exec --no-startup-id i3-custom-applications audio-volume-mute
 
 # Sreen brightness controls
-bindsym XF86MonBrightnessUp   exec --no-startup-id i3-custom-buttons backlight-up
-bindsym XF86MonBrightnessDown exec --no-startup-id i3-custom-buttons backlight-down
+bindsym XF86MonBrightnessUp   exec --no-startup-id i3-custom-applications backlight-up
+bindsym XF86MonBrightnessDown exec --no-startup-id i3-custom-applications backlight-down
 
 # Media player controls
-bindsym XF86AudioPlay  exec --no-startup-id i3-custom-buttons play
-bindsym XF86AudioPause exec --no-startup-id i3-custom-buttons pause
-bindsym XF86AudioNext  exec --no-startup-id i3-custom-buttons next
-bindsym XF86AudioPrev  exec --no-startup-id i3-custom-buttons prev
+bindsym XF86AudioPlay  exec --no-startup-id i3-custom-applications audio-play
+bindsym XF86AudioPause exec --no-startup-id i3-custom-applications audio-pause
+bindsym XF86AudioNext  exec --no-startup-id i3-custom-applications audio-next
+bindsym XF86AudioPrev  exec --no-startup-id i3-custom-applications audio-prev
 
 # Others special controls
 bindsym XF86Tools      exec --no-startup-id i3-custom-applications player

@@ -1,6 +1,14 @@
 #! /bin/bash
 set -e
 
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    echo "Convert keywords to font-icons (stdin -> stdout)"
+    echo "---------------------"
+    echo "Usage: $THIS"
+    exit
+fi
+
 ICONS=( "OUT:"
         "IN:"
         "CPU:"

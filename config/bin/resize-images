@@ -1,8 +1,19 @@
 #!/bin/bash
+set -e
+
+SIZE=1024
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    echo "Convert images to $SIZE px"
+    echo "---------------------"
+    echo "Usage: $THIS <file-mask>"
+    exit
+fi
 
 for filename in $1
 do
     [ -f "$filename" ] || continue
-    echo "Convert: $filename to 1024 px. New name: r-$filename"
-    convert $filename -resize 1024 r-$filename
+    echo "Convert: $filename to $SIZE px. New name: $SIZE-$filename"
+    convert $filename -resize $SIZE r-$filename
 done

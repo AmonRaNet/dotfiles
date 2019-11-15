@@ -1,4 +1,13 @@
 #!/bin/bash
+set -e
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    echo "Run in detach mode (nohup)"
+    echo "---------------------"
+    echo "Usage: $THIS <command>"
+    exit
+fi
 
 echo "Run in detach mode (nohup): $@"
 nohup "$@" > /dev/null 2>&1 &
