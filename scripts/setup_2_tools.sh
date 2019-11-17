@@ -169,6 +169,8 @@ fi
 
 if is_install "variety"; then
    echo_install $INSTALL_TARGET
+   sudo add-apt-repository -y ppa:variety/stable
+   sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install variety
    sudo apt-get --assume-yes --no-install-recommends install feh
    target_done $INSTALL_TARGET

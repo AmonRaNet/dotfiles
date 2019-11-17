@@ -1,14 +1,26 @@
 # AmonRaNet dotfiles and scripts
 
-Config files for:
+**Install scripts**
+- i3 (i3gaps, i3blocks, i3lock)
+- terminals and shells (fish, zsh)
+- tools
+- developer: cpp, python, android
+- etc
+
+Usage:
+```
+config/install
+```
+
+**User config files**
 - i3
 - i3blocks
 - compton
+- gnome-terminal
 - terminator
+- etc
 
-Install scripts for:
-- i3 and related managers
-- terminator and shells (fish, zsh)
-- different tools and controls
-- developer toolset: cpp, python, android
-- custom tools
+Usage:
+```
+scripts/install
+```
