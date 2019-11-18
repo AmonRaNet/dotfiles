@@ -29,19 +29,21 @@ set -e
 
 # install basic tools
 echo_install "basic tools"
+echo_task "prepare ubuntu"
+if is_ubuntu18; then
+    sudo add-apt-repository universe
+fi
+echo_task "source-auto"
 $DIR/source-auto/install
 source-auto enable bash
+echo_task "basic packages"
 sudo apt-get --assume-yes --no-install-recommends install git
 sudo apt-get --assume-yes --no-install-recommends install build-essential
 sudo apt-get --assume-yes --no-install-recommends install pkg-config
 if [ ! -f "$EXPECTED_INSTALL_FILE" ]; then
    cp -v $DIR/setup-expected.conf $EXPECTED_INSTALL_FILE
 fi
-
-# prepare ubuntu
-if is_ubuntu18; then
-    sudo add-apt-repository universe
-fi
+mark_done
 
 # install setup files
 for filename in $DIR/setup_*.sh
@@ -49,7 +51,6 @@ do
    [ -f "$filename" ] || continue
    shortname=$(basename -- "$filename")
    if is_install "$shortname"; then
-       echo_install "Run $shortname"
        eval "$DIR/$shortname"
    fi
 done

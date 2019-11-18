@@ -32,12 +32,20 @@ set -e
 
 echo_install() {
     echo "${BLUE}==========================================================${NORMAL}"
-    echo "${BOLD}                 Apply '$1'${NORMAL}"
+    echo "${BOLD}                 $1${NORMAL}"
     echo "${BLUE}==========================================================${NORMAL}"
 }
 
 echo_task() {
     echo "${GREEN}${BOLD}--->${NORMAL}$1"
+}
+
+mark_done() {
+    echo "${GREEN}${BOLD}<DONE>${NORMAL}"
+}
+
+mark_skipped() {
+    echo "${RED}${BOLD}<SKIPPED>${NORMAL}"
 }
 
 INSTALL_TARGET=""
@@ -63,6 +71,7 @@ install_target() {
 
 target_done() {
    sed -i '/'"$1"'/d' "$EXPECTED_INSTALL_FILE"
+   mark_done
 }
 
 is_install() {

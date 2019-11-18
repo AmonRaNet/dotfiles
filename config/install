@@ -28,14 +28,6 @@ copy_config() {
     cp -vR $DIR/$CONFIG ~/.config/
 }
 
-mark_done() {
-    echo "${GREEN}DONE${NORMAL}"
-}
-
-mark_skipped() {
-    echo "${RED}SKIPPED${NORMAL}"
-}
-
 echo_install "validate"
 validate_missing_init
 if ! test_command "ls /usr/share/fonts/opentype/font-awesome"; then
