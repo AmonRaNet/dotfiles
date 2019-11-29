@@ -34,12 +34,14 @@ exit_wrong_cmd () {
 function _finish {
     code=$?
     if [ $code = $wrong_cmd ]; then
-        echoerr "${RED}Supported shells: ${WHITE}bash, fish, zsh${NORMAL}"
-        echoerr "${RED}Command to enable/disable sources, example ${WHITE}enable/disable shell${NORMAL}"
-        echoerr "${RED}Command to list/path/show/print/edit sources, example ${WHITE}list/path/show/print/edit shell/* foo/*${NORMAL}"
-        echoerr "${RED}Command to link file, example ${WHITE}link shell foo path/to/file${NORMAL}"
-        echoerr "${RED}Command to add script, example ${WHITE}script shell foo \"export MY_FOO=1\"${NORMAL}"
-        echoerr "${RED}Command to remove files, example ${WHITE}remove shell/* foo/*${NORMAL}"
+        echoerr "${BLUE}Supported shells: ${WHITE}<shell>=bash|fish|zsh${NORMAL}"
+        echoerr "${BLUE}Supported names: ${WHITE}<name>=..., for example foo${NORMAL}"
+        echoerr "${BLUE}Mask filtering for shells and names allowed by: ${WHITE}*${NORMAL}"
+        echoerr "${BLUE}Command to enable/disable sources, example ${WHITE}${BOLD}source-auto enable|disable <shell>${NORMAL}"
+        echoerr "${BLUE}Command to list/path/show/print/edit sources, example ${WHITE}${BOLD}source-auto list|path|show|print|edit <shell>|* <name>|*${NORMAL}"
+        echoerr "${BLUE}Command to link file, example ${WHITE}${BOLD}source-auto link <shell> <name> path/to/file${NORMAL}"
+        echoerr "${BLUE}Command to add custom script, example ${WHITE}${BOLD}source-auto script <shell> <name> \"export MY_FOO=1\"${NORMAL}"
+        echoerr "${BLUE}Command to remove file/link, example ${WHITE}${BOLD}source-auto remove <shell>|* <name>|*${NORMAL}"
     fi
 }
 trap _finish EXIT
