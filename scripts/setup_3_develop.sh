@@ -19,19 +19,19 @@ else
     libhunspell_version=1.3
 fi
 
+clang_version=9
+
 set +e
 choice=($(whiptail \
   --checklist "C++ tools setup (AmonRaNet)" 20 80 15 \
   $(install_target cmake) \
   $(install_target ninja) \
   $(install_target bazel) \
-  $(install_target clang-6.0) \
-  $(install_target clang-format-6.0) \
-  $(install_target clang-tidy-6.0) \
+  $(install_target clang v-$clang_version) \
   $(install_target ccache) \
   $(install_target qtframework) \
-  $(install_target qtcreator $qtcreator_version) \
-  $(install_target qtspellcheck $qtcreator_spellcheck_version) \
+  $(install_target qtcreator v-$qtcreator_version) \
+  $(install_target qtspellcheck v-$qtcreator_spellcheck_version) \
   $(install_target code visual-studio-code) \
   $(install_target atom) \
   $(install_target atompackages custom) \
@@ -48,29 +48,32 @@ if is_install "ninja"; then
     target_done $INSTALL_TARGET
 fi
 
-if is_install "clang-6.0"; then
+if is_install "clang"; then
     echo_install $INSTALL_TARGET
-    sudo apt-get --assume-yes --no-install-recommends install clang-6.0
-    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-6.0 1000
-    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-6.0 1000
+    sudo sh -c 'echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main \n \
+                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main \n \
+                      deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main \n \
+                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main \n \
+                      deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main \n \
+                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main \n \
+                      " > /etc/apt/sources.list.d/llvm.list'
+    wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    sudo apt-get update
+
+    sudo apt-get --assume-yes --no-install-recommends install clang-$clang_version
+    sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 1000
+    sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-$clang_version 1000
     sudo update-alternatives --config clang
     sudo update-alternatives --config clang++
-    target_done $INSTALL_TARGET
-fi
 
-if is_install "clang-format-6.0"; then
-    echo_install $INSTALL_TARGET
-    sudo apt-get --assume-yes --no-install-recommends install clang-format-6.0
-    sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-6.0 1000
+    sudo apt-get --assume-yes --no-install-recommends install clang-format-$clang_version
+    sudo update-alternatives --install /usr/bin/clang-format clang-format /usr/bin/clang-format-$clang_version 1000
     sudo update-alternatives --config clang-format
-    target_done $INSTALL_TARGET
-fi
 
-if is_install "clang-tidy-6.0"; then
-    echo_install $INSTALL_TARGET
-    sudo apt-get --assume-yes --no-install-recommends install clang-tidy-6.0
-    sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-6.0 1000
+    sudo apt-get --assume-yes --no-install-recommends install clang-tidy-$clang_version
+    sudo update-alternatives --install /usr/bin/clang-tidy clang-tidy /usr/bin/clang-tidy-$clang_version 1000
     sudo update-alternatives --config clang-tidy
+
     target_done $INSTALL_TARGET
 fi
 
