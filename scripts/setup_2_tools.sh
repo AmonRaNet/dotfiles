@@ -187,12 +187,14 @@ fi
 
 if is_install "gdrive"; then
    echo_install $INSTALL_TARGET
-   sudo add-apt-repository -y ppa:nilarimogard/webupd8
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install grive
+
    sudo apt-get --assume-yes --no-install-recommends install inotify-tools
-   wget -N -O /tmp/grive-tools-all.deb https://github.com/AmonRaNet/grive-tools/releases/download/1.15/grive-tools_1.15-1_all.deb
-   install_deb "/tmp/grive-tools-all.deb"
+
+   app_id="$(input_dialog "grive custom client_id" "")"
+   secret_id="$(input_dialog "grive custom secret_id" "")"
+   build_in_docker $DIR/make_grive.sh "$app_id" "$secret_id"
+   build_in_host $DIR/make_grivetools.sh
+
    msg_dialog "Finish setup and exit setup application to continue!"
    /opt/thefanclub/grive-tools/grive-setup
    target_done $INSTALL_TARGET

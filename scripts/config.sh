@@ -134,8 +134,8 @@ test_command() {
 build_in_docker() {
     local make_script=$1
     local build_dir="/tmp/build_in_docker"
-    sudo mkdir -p $build_dir
-    sudo rm -rf $build_dir/*
+    mkdir -p $build_dir
+    rm -rf $build_dir/*
     echo ${YELLOW}
     docker run -it \
            -v $make_script:$make_script:ro \
@@ -143,11 +143,24 @@ build_in_docker() {
            -w $build_dir \
            --entrypoint "/bin/bash" \
            ubuntu:$(lsb_release -cs) \
-           $make_script build
+           $make_script build ${@:2}
     sudo chown -R --quiet $USER:$GROUPS $build_dir
     echo ${NORMAL}
     pushd .
     cd $build_dir
+    $make_script install
+    $make_script config
+    popd
+}
+
+build_in_host() {
+    local make_script=$1
+    local build_dir="/tmp/build_in_host"
+    mkdir -p $build_dir
+    rm -rf $build_dir/*
+    pushd .
+    cd $build_dir
+    $make_script build ${@:2}
     $make_script install
     $make_script config
     popd
