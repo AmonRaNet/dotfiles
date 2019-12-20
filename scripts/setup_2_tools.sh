@@ -52,6 +52,7 @@ choice=($(whiptail \
   $(install_target zeal local-docs) \
   $(install_target bat alternative-cat) \
   $(install_target fd alternative-find) \
+  $(install_target mosh ssh-mobile-shell) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -76,7 +77,8 @@ simple=("vim" \
         "zim" \
         "keepassx" \
         "kazam" \
-        "blueproximity")
+        "blueproximity" \
+        "mosh")
 for i in ${simple[@]}
 do
    if is_install "$i"; then
