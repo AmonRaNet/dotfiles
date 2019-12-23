@@ -33,6 +33,7 @@ choice=($(whiptail \
   $(install_target wine) \
   $(install_target gitkraken) \
   $(install_target giteye) \
+  $(install_target icdiff color-diff-side-by-side) \
   $(install_target lightshot screenshot-tool) \
   $(install_target scrot screenshot-tool) \
   $(install_target glogg log-reader) \
@@ -139,6 +140,13 @@ if is_install "giteye"; then
    wget -N -O /tmp/giteye-x64.zip https://www.collab.net/sites/default/files/downloads/GitEye-2.1.0-linux.x86_64.zip
    sudo unzip /tmp/giteye-x64.zip -d /opt/giteye
    sudo ln -s /opt/giteye/GitEye /usr/bin/giteye
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "icdiff"; then
+   echo_install $INSTALL_TARGET
+   pip install --user git+https://github.com/jeffkaufman/icdiff.git
+   git config --global icdiff.options '--highlight --line-numbers'
    target_done $INSTALL_TARGET
 fi
 
