@@ -10,14 +10,11 @@ fi
 
 source $DIR/config.sh
 
-qtcreator_version=4.8
-qtcreator_build=1
-qtcreator_spellcheck_version=2.0.1
-if is_ubuntu18; then
-    libhunspell_version=1.6
-else
-    libhunspell_version=1.3
-fi
+qtcreator_version=4.11
+qtcreator_build=0
+qtcreator_spellcheck_version=2.0.5
+qtcreator_spellcheck_libhunspell_version=1.7
+libhunspell_version=1.6-0
 
 clang_version=9
 
@@ -124,9 +121,9 @@ fi
 
 if is_install "qtspellcheck"; then
    echo_install $INSTALL_TARGET
-   sudo apt-get --assume-yes --no-install-recommends install libhunspell-${libhunspell_version}-0
+   sudo apt-get --assume-yes --no-install-recommends install libhunspell-${libhunspell_version}
    qtcreator_dir=$(input_dialog "QtCreator directory" "/opt/qtcreator-$qtcreator_version.$qtcreator_build")
-   wget -N -O /tmp/qt-x64-spellcheck.tar.gz https://github.com/CJCombrink/SpellChecker-Plugin/releases/download/v$qtcreator_spellcheck_version/SpellChecker-Plugin_v${qtcreator_spellcheck_version}_Hunspell_v${libhunspell_version}_x64.tar.gz
+   wget -N -O /tmp/qt-x64-spellcheck.tar.gz https://github.com/CJCombrink/SpellChecker-Plugin/releases/download/v$qtcreator_spellcheck_version/SpellChecker-Plugin_v${qtcreator_spellcheck_version}_Hunspell_v${qtcreator_spellcheck_libhunspell_version}_x64.tar.gz
    sudo tar -xzvf /tmp/qt-x64-spellcheck.tar.gz --directory $qtcreator_dir --strip-components 1
    if yesno_dialog "Use default dictionary package?"; then
        sudo apt-get --assume-yes --no-install-recommends install hunspell-en-gb
