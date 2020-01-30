@@ -54,6 +54,7 @@ choice=($(whiptail \
   $(install_target bat alternative-cat) \
   $(install_target fd alternative-find) \
   $(install_target mosh ssh-mobile-shell) \
+  $(install_target dbeaver database-viewer) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -252,5 +253,12 @@ if is_install "fd"; then
    echo_install $INSTALL_TARGET
    wget -N -O /tmp/fd_amd64.deb https://github.com/sharkdp/fd/releases/download/v7.4.0/fd_7.4.0_amd64.deb
    install_deb "/tmp/fd_amd64.deb"
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "dbeaver"; then
+   echo_install $INSTALL_TARGET
+   wget -N -O /tmp/dbeaver_amd64.deb https://dbeaver.io/files/dbeaver-ce_latest_amd64.deb
+   install_deb "/tmp/dbeaver_amd64.deb"
    target_done $INSTALL_TARGET
 fi
