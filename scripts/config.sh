@@ -132,10 +132,11 @@ test_command() {
 }
 
 build_in_docker() {
+    echo_task "BUILD_IN_DOCKER"
     local make_script=$1
     local build_dir="/tmp/build_in_docker"
     mkdir -p $build_dir
-    rm -rf $build_dir/*
+    sudo rm -rf $build_dir/*
     echo ${YELLOW}
     docker run -it \
            -v $make_script:$make_script:ro \
@@ -154,6 +155,7 @@ build_in_docker() {
 }
 
 build_in_host() {
+    echo_task "BUILD_IN_HOST"
     local make_script=$1
     local build_dir="/tmp/build_in_host"
     mkdir -p $build_dir
