@@ -1,0 +1,238 @@
+#!/usr/bin/python3
+
+# pylint: disable=missing-docstring
+
+import os
+from os.path import expanduser
+import select
+import time
+import argparse
+import signal
+import base64
+import struct
+from threading import Thread
+
+from pykeyboard import PyKeyboard
+from pykeyboard import PyKeyboardEvent
+
+from Crypto import Random
+from Crypto.Cipher import AES
+from Crypto.Hash import MD5
+
+# Const
+SECRETS_PATH = expanduser('~') + '/.config/rfid_secrects'
+SECRET_CHARACTER = 'Pause'
+TIMEOUT = 2.0
+SLEEP_TIME = 1.0
+
+# Global variables
+secret_allowed = False
+exit_flag = False
+last_rfid = None
+
+class AESCipher(object):
+    def __init__(self, key):
+        self.bs = AES.block_size
+        hash_key = MD5.new()
+        hash_key.update(key.encode('ascii'))
+        self.key = hash_key.hexdigest()
+
+    def _pad(self, s):
+        return s + (self.bs - len(s) % self.bs) * '0'
+
+    def encrypt(self, raw):
+        raw_size = len(raw)
+        raw_bytes = self._pad(raw)
+        raw_size_bytes = struct.pack('<i', raw_size)
+        iv = Random.new().read(AES.block_size)
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        return base64.b64encode(iv + raw_size_bytes + cipher.encrypt(raw_bytes))
+
+    def decrypt(self, enc):
+        enc = base64.b64decode(enc)
+        iv = enc[:self.bs]
+        raw_size = struct.unpack('<i', enc[self.bs:self.bs + 4])[0]
+        cipher = AES.new(self.key, AES.MODE_CBC, iv)
+        raw_bytes = cipher.decrypt(enc[self.bs + 4:])
+        try:
+            raw = raw_bytes[:raw_size].decode('utf_8')
+        except:
+            raw = ''
+        return raw
+
+
+class ClickKeyEventListener(PyKeyboardEvent):
+    def tap(self, keycode, character, press):
+        global secret_allowed
+        secret_allowed = character == SECRET_CHARACTER and press
+
+    def escape(self, event):
+        del event
+        global exit_flag
+        return exit_flag
+
+class RFIDReader:
+    def __init__(self):
+        self.fd = None
+        self.rfid_detected = False
+        self.rfid = None
+
+    def open(self, tty_device):
+        if self.is_open():
+            return
+        try:
+            self.fd = os.open(tty_device, os.O_RDONLY)
+        except IOError:
+            self.fd = None
+
+    def is_open(self):
+        return self.fd is not None
+
+    def read(self, timeout=TIMEOUT):
+        try:
+            if not self.is_open():
+                return
+            reads, _, _ = select.select([self.fd], [], [], timeout)
+            if len(reads) < 0:
+                self.close()
+            if not reads:
+                return
+            character = os.read(reads[0], 1).decode('ascii')
+
+            if self.rfid_detected:
+                self.rfid = None
+                self.rfid_detected = False
+            if character == '\r' or character == '\n':
+                self.rfid_detected = True
+            else:
+                if self.rfid is None:
+                    self.rfid = character
+                else:
+                    self.rfid += character
+        except IOError:
+            self.fd = None
+
+    def take_rfid(self):
+        if self.rfid_detected:
+            value = self.rfid
+            self.rfid = None
+            return value
+        return None
+
+    def close(self):
+        if self.is_open():
+            os.close(self.fd)
+            self.fd = None
+
+
+def keyboard_listen():
+    key_events = ClickKeyEventListener()
+    key_events.start()
+    while not exit_flag:
+        time.sleep(SLEEP_TIME)
+    print('Exit from keyboard_listen')
+
+
+def rfid_listen(tty_device, secrets, single_read=False):
+    global exit_flag
+    global last_rfid
+    print('Start listen RFID: %s' % tty_device)
+    reader = RFIDReader()
+    keyboard = PyKeyboard()
+    while True:
+        reader.open(tty_device)
+        reader.read()
+        last_rfid = reader.take_rfid()
+        if exit_flag:
+            break
+        if not reader.is_open():
+            print('Could not open/read file! Repeat...')
+            time.sleep(SLEEP_TIME)
+            continue
+        if last_rfid is None:
+            continue
+        print(last_rfid)
+        if single_read:
+            break
+        if not secret_allowed:
+            continue
+        cipher = AESCipher(last_rfid)
+        secret_pass = cipher.decrypt(secrets)
+        if not secret_pass.endswith('\tVALID'):
+            continue
+        print('Correct RFID found')
+        print('Apply secret pass')
+
+        for out in secret_pass.split('\t')[0]:
+            keyboard.tap_key(out)
+        keyboard.tap_key(keyboard.enter_key)
+    reader.close()
+    print('Exit from rfid_listen')
+
+
+def cmd_create_pass(args):
+    global last_rfid
+    rfid_listen(args.device, secrets=b'', single_read=True)
+    if last_rfid is None:
+        print('RFID not readed')
+        return
+
+    cipher = AESCipher(last_rfid)
+    enc_crypt = cipher.encrypt(args.password + '\tVALID')
+    print('Crypted by : %s' % last_rfid)
+    print('Origin: %s' % args.password)
+    print('Crypted: %s' % enc_crypt)
+
+    file = open(SECRETS_PATH, 'w')
+    file.write(enc_crypt.hex())
+    file.close()
+    print('Pass entry created %s' % SECRETS_PATH)
+
+
+def cmd_listen(args):
+    file = open(SECRETS_PATH, 'r')
+    secrets = bytes.fromhex(file.read())
+    file.close()
+
+    thread1 = Thread(target=rfid_listen, args=(args.device, secrets, False,))
+    thread2 = Thread(target=keyboard_listen, args=())
+    thread1.start()
+    thread2.start()
+    thread1.join()
+    thread2.join()
+    print('Exit from cmd_listen')
+
+def exit_gracefully(signum, frame):
+    del signum, frame
+    global exit_flag
+    exit_flag = True
+    print('Exit from main. Wait threads to be finished...')
+
+def main():
+    signal.signal(signal.SIGINT, exit_gracefully)
+    signal.signal(signal.SIGTERM, exit_gracefully)
+
+    parser = argparse.ArgumentParser(description='RFID to password')
+    parser.add_argument('--device', default='/dev/ttyACM0',
+                        help='RFID TTY device', metavar='<device>')
+    subparsers = parser.add_subparsers()
+
+    create_parser = subparsers.add_parser('create_pass',
+                                          description='Create password for RFID')
+    create_parser.add_argument('password', type=str,
+                               help='Password to store.', metavar='<password>')
+    create_parser.set_defaults(func=cmd_create_pass)
+
+    create_parser = subparsers.add_parser('listen', description='Listen RFID.')
+    create_parser.set_defaults(func=cmd_listen)
+
+    args = parser.parse_args()
+    try:
+        args.func(args)
+    except AttributeError:
+        parser.print_help()
+        parser.exit()
+        return
+
+if __name__ == '__main__':
+    main()
