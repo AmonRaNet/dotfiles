@@ -10,6 +10,8 @@ import argparse
 import signal
 import base64
 import struct
+import logging
+import sys
 from threading import Thread
 
 from pykeyboard import PyKeyboard
@@ -26,9 +28,11 @@ TIMEOUT = 2.0
 SLEEP_TIME = 1.0
 
 # Global variables
+log = logging.getLogger()
 secret_allowed = False
 exit_flag = False
 last_rfid = None
+
 
 class AESCipher(object):
     def __init__(self, key):
@@ -71,6 +75,7 @@ class ClickKeyEventListener(PyKeyboardEvent):
         global exit_flag
         return exit_flag
 
+
 class RFIDReader:
     def __init__(self):
         self.fd = None
@@ -81,9 +86,11 @@ class RFIDReader:
         if self.is_open():
             return
         try:
+            os.stat(tty_device)
             self.fd = os.open(tty_device, os.O_RDONLY)
-        except IOError:
-            self.fd = None
+            log.info('Open device')
+        except (OSError, IOError):
+            self.close()
 
     def is_open(self):
         return self.fd is not None
@@ -92,12 +99,13 @@ class RFIDReader:
         try:
             if not self.is_open():
                 return
-            reads, _, _ = select.select([self.fd], [], [], timeout)
-            if len(reads) < 0:
-                self.close()
-            if not reads:
+            ready, _, _ = select.select([self.fd], [], [], timeout)
+            if len(ready) < 1:
                 return
-            character = os.read(reads[0], 1).decode('ascii')
+            character = os.read(ready[0], 1).decode('ascii')
+            if character == '':
+                self.close()
+                return
 
             if self.rfid_detected:
                 self.rfid = None
@@ -110,7 +118,7 @@ class RFIDReader:
                 else:
                     self.rfid += character
         except IOError:
-            self.fd = None
+            self.close()
 
     def take_rfid(self):
         if self.rfid_detected:
@@ -121,6 +129,7 @@ class RFIDReader:
 
     def close(self):
         if self.is_open():
+            log.info('Close device')
             os.close(self.fd)
             self.fd = None
 
@@ -130,28 +139,28 @@ def keyboard_listen():
     key_events.start()
     while not exit_flag:
         time.sleep(SLEEP_TIME)
-    print('Exit from keyboard_listen')
+    log.debug('Exit from keyboard_listen')
 
 
 def rfid_listen(tty_device, secrets, single_read=False):
     global exit_flag
     global last_rfid
-    print('Start listen RFID: %s' % tty_device)
+    log.info('Start listen RFID: %s' % tty_device)
     reader = RFIDReader()
     keyboard = PyKeyboard()
-    while True:
+    while not exit_flag:
         reader.open(tty_device)
         reader.read()
         last_rfid = reader.take_rfid()
         if exit_flag:
             break
         if not reader.is_open():
-            print('Could not open/read file! Repeat...')
+            log.error('Could not open/read file! Repeat...')
             time.sleep(SLEEP_TIME)
             continue
         if last_rfid is None:
             continue
-        print(last_rfid)
+        log.info(last_rfid)
         if single_read:
             break
         if not secret_allowed:
@@ -160,33 +169,33 @@ def rfid_listen(tty_device, secrets, single_read=False):
         secret_pass = cipher.decrypt(secrets)
         if not secret_pass.endswith('\tVALID'):
             continue
-        print('Correct RFID found')
-        print('Apply secret pass')
+        log.warning('Correct RFID found. Apply secret pass')
 
         for out in secret_pass.split('\t')[0]:
             keyboard.tap_key(out)
         keyboard.tap_key(keyboard.enter_key)
     reader.close()
-    print('Exit from rfid_listen')
+    log.debug('Exit from rfid_listen')
 
 
 def cmd_create_pass(args):
+    log.info('Wait RFID for encryption...')
     global last_rfid
     rfid_listen(args.device, secrets=b'', single_read=True)
     if last_rfid is None:
-        print('RFID not readed')
+        log.error('RFID not readed')
         return
 
     cipher = AESCipher(last_rfid)
     enc_crypt = cipher.encrypt(args.password + '\tVALID')
-    print('Crypted by : %s' % last_rfid)
-    print('Origin: %s' % args.password)
-    print('Crypted: %s' % enc_crypt)
+    log.debug('Crypted by : %s' % last_rfid)
+    log.debug('Origin: %s' % args.password)
+    log.debug('Crypted: %s' % enc_crypt)
 
     file = open(SECRETS_PATH, 'w')
     file.write(enc_crypt.hex())
     file.close()
-    print('Pass entry created %s' % SECRETS_PATH)
+    log.info('Pass entry created %s' % SECRETS_PATH)
 
 
 def cmd_listen(args):
@@ -200,13 +209,26 @@ def cmd_listen(args):
     thread2.start()
     thread1.join()
     thread2.join()
-    print('Exit from cmd_listen')
+    log.debug('Exit from cmd_listen')
 
 def exit_gracefully(signum, frame):
     del signum, frame
     global exit_flag
     exit_flag = True
-    print('Exit from main. Wait threads to be finished...')
+    log.info('Exit from main. Wait threads to be finished...')
+
+def prepare_log():
+    global log
+    log.setLevel(logging.DEBUG)
+
+    formatter_std = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+    handler_std = logging.StreamHandler(sys.stdout)
+    handler_std.setFormatter(formatter_std)
+    if sys.stdout.isatty():
+        handler_std.setLevel(logging.DEBUG)
+    else:
+        handler_std.setLevel(logging.INFO)
+    log.addHandler(handler_std)
 
 def main():
     signal.signal(signal.SIGINT, exit_gracefully)
@@ -217,7 +239,7 @@ def main():
                         help='RFID TTY device', metavar='<device>')
     subparsers = parser.add_subparsers()
 
-    create_parser = subparsers.add_parser('create_pass',
+    create_parser = subparsers.add_parser('create_password',
                                           description='Create password for RFID')
     create_parser.add_argument('password', type=str,
                                help='Password to store.', metavar='<password>')
@@ -227,7 +249,9 @@ def main():
     create_parser.set_defaults(func=cmd_listen)
 
     args = parser.parse_args()
+
     try:
+        prepare_log()
         args.func(args)
     except AttributeError:
         parser.print_help()
