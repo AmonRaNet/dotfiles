@@ -47,13 +47,14 @@ fi
 
 if is_install "clang"; then
     echo_install $INSTALL_TARGET
-    sudo sh -c 'echo "deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main \n \
-                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic main \n \
-                      deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main \n \
-                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-8 main \n \
-                      deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main \n \
-                      deb-src http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main \n \
-                      " > /etc/apt/sources.list.d/llvm.list'
+    ubuntu=$(lsb_release -cs)
+    echo -e "deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
+          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
+          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-8 main \n \
+          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-8 main \n \
+          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-9 main \n \
+          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-9 main \n \
+          " |  sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
     wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
     sudo apt-get update
 
