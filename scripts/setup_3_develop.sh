@@ -16,6 +16,7 @@ qtcreator_spellcheck_version=2.0.5
 qtcreator_spellcheck_libhunspell_version=1.7
 libhunspell_version=1.6-0
 
+gcc_version=8
 clang_version=9
 
 set +e
@@ -24,6 +25,7 @@ choice=($(whiptail \
   $(install_target cmake) \
   $(install_target ninja) \
   $(install_target bazel) \
+  $(install_target gcc v-$gcc_version) \
   $(install_target clang v-$clang_version) \
   $(install_target ccache) \
   $(install_target qtframework) \
@@ -42,6 +44,20 @@ set -e
 if is_install "ninja"; then
     echo_install $INSTALL_TARGET
     sudo apt-get --assume-yes --no-install-recommends install ninja-build
+    target_done $INSTALL_TARGET
+fi
+
+if is_install "gcc"; then
+    echo_install $INSTALL_TARGET
+    if is_ubuntu16; then
+        sudo add-apt-repository ppa:jonathonf/gcc
+    fi
+    sudo apt-get update
+    sudo apt-get --assume-yes --no-install-recommends install gcc-${gcc_version} g++-${gcc_version}
+    sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${gcc_version} 1000
+    sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${gcc_version} 1000
+    sudo update-alternatives --config gcc
+    sudo update-alternatives --config g++
     target_done $INSTALL_TARGET
 fi
 
