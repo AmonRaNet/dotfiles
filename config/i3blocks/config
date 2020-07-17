@@ -20,6 +20,15 @@ interval=5
 signal=10
 STEP=5%
 
+[volume-mic]
+command=$SCRIPT_DIR/volume/volume
+LABEL=SOUND-mic:
+color=#00FF55
+interval=5
+signal=10
+STEP=5%
+SCONTROL=Capture
+
 [battery2]
 interval=30
 
