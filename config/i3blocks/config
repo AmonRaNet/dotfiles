@@ -30,6 +30,8 @@ STEP=5%
 SCONTROL=Capture
 
 [battery2]
+LOW_NOTIFY=notify-send --icon=battery -u critical Battery "Too low battery!"
+LOW_TRIGGER=10
 interval=30
 
 [calendar]
