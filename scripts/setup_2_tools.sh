@@ -57,6 +57,7 @@ choice=($(whiptail \
   $(install_target dbeaver database-viewer) \
   $(install_target rfid custom-rfid-tools) \
   $(install_target ripgrep ripgrep) \
+  $(install_target vbox virtual-box) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -275,5 +276,14 @@ if is_install "ripgrep"; then
    echo_install $INSTALL_TARGET
    wget -N -O /tmp/ripgrep_amd64.deb https://github.com/BurntSushi/ripgrep/releases/download/11.0.2/ripgrep_11.0.2_amd64.deb
    install_deb "/tmp/ripgrep_amd64.deb"
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "vbox"; then
+   echo_install $INSTALL_TARGET
+   wget -q -O - https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo apt-key add -
+   echo 'deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian '$(lsb_release -cs)' contrib' | sudo tee /etc/apt/sources.list.d/oracle-vbox.list
+   sudo apt-get update
+   sudo apt-get --assume-yes --no-install-recommends install virtualbox-6.1
    target_done $INSTALL_TARGET
 fi
