@@ -40,6 +40,7 @@ echo_task "basic packages"
 sudo apt-get --assume-yes --no-install-recommends install git
 sudo apt-get --assume-yes --no-install-recommends install build-essential
 sudo apt-get --assume-yes --no-install-recommends install pkg-config
+sudo apt-get --assume-yes --no-install-recommends install unzip
 if [ ! -f "$EXPECTED_INSTALL_FILE" ]; then
    cp -v $DIR/setup-expected.conf $EXPECTED_INSTALL_FILE
 fi

@@ -111,6 +111,7 @@ fi
 
 if is_install "awesome-fonts"; then
    echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install fontconfig
    sudo apt-get --assume-yes --no-install-recommends install fonts-font-awesome
    wget -N -O /tmp/awesome-fonts.zip https://use.fontawesome.com/releases/v5.5.0/fontawesome-free-5.5.0-desktop.zip
    unzip -o /tmp/awesome-fonts.zip 'fontawesome-free-5.5.0-desktop/otfs/*' -d /tmp/awesome-fonts
@@ -123,6 +124,7 @@ fi
 
 if is_install "powerline-fonts"; then
    echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install fontconfig
    wget -N -O /tmp/powerline-fonts.zip https://codeload.github.com/powerline/fonts/zip/master
    unzip -o /tmp/powerline-fonts.zip -d /tmp/powerline-fonts
    bash /tmp/powerline-fonts/fonts-master/install.sh
