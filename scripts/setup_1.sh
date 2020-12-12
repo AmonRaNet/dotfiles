@@ -13,7 +13,9 @@ source $DIR/config.sh
 set +e
 choice=($(whiptail \
   --checklist "General tools setup (AmonRaNet)" 20 80 15 \
-  $(install_target python) \
+  $(install_target custom_build) \
+  $(install_target python2) \
+  $(install_target python3) \
   $(install_target docker) \
   $(install_target i3) \
   $(install_target i3bloks) \
@@ -21,6 +23,7 @@ choice=($(whiptail \
   $(install_target vim) \
   $(install_target terminator) \
   $(install_target gnome-terminal) \
+  $(install_target gnome-policykit) \
   $(install_target awesome-fonts) \
   $(install_target powerline-fonts) \
   $(install_target nerd-fonts) \
@@ -46,14 +49,29 @@ set_default_shell() {
   sudo echo "export SHELL=$SHELL" | sudo tee -a ~/.profiles
 }
 
-if is_install "python"; then
+if is_install "custom_build"; then
    echo_install $INSTALL_TARGET
-   sudo apt-get --assume-yes --no-install-recommends install python
+   build_in_docker $DIR/make_custom.sh
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "python2"; then
+   echo_install $INSTALL_TARGET
+   if is_ubuntu20_or_higher; then
+       msg_dialog "Python2 is not supported"
+   else
+       sudo apt-get --assume-yes --no-install-recommends install python
+       sudo apt-get --assume-yes --no-install-recommends install python-pip
+       sudo bash -c "pip install --upgrade pip"
+   fi
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "python3"; then
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install python3
-   sudo apt-get --assume-yes --no-install-recommends install python-pip
    sudo apt-get --assume-yes --no-install-recommends install python3-pip
-   sudo bash -c "pip install --upgrade pip"
-   sudo bash -c "pip3 install --upgrade pip"
+   sudo bash -c "pip3 install --upgrade pip --break-system-packages"
    target_done $INSTALL_TARGET
 fi
 
@@ -96,10 +114,15 @@ fi
 
 if is_install "vim"; then
    echo_install $INSTALL_TARGET
-
-   sudo add-apt-repository -y ppa:jonathonf/vim
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install vim
+   if is_ubuntu20_or_higher; then
+     sudo apt remove --assume-yes vim-tiny
+     sudo apt-get -q update
+     sudo apt install --assume-yes --no-install-recommends vim
+   else
+     sudo add-apt-repository -y ppa:jonathonf/vim-daily
+     sudo apt-get -q update
+     sudo apt-get --assume-yes --no-install-recommends install vim
+   fi
 
    sudo rm -fR ~/.vim/pack/amonranet/
    git clone https://github.com/vim-airline/vim-airline.git ~/.vim/pack/amonranet/start/vim-airline
@@ -134,6 +157,12 @@ if is_install "gnome-terminal"; then
    if yesno_dialog "$INSTALL_TARGET as default?"; then
      set_default_terminal gnome-terminal
    fi
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "gnome-policykit"; then
+   echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install policykit-1-gnome
    target_done $INSTALL_TARGET
 fi
 
@@ -175,9 +204,13 @@ if is_install "fish-shell"; then
    sudo rm -f ~/.config/fish/conf.d/omf.fish
    sudo rm -f ~/.config/fish/functions/fish_prompt.fish
    #fish
-   sudo apt-add-repository -y ppa:fish-shell/release-3
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   if is_ubuntu20_or_higher; then
+       sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   else
+       sudo apt-add-repository -y ppa:fish-shell/release-2
+       sudo apt-get -q update
+       sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   fi
    if yesno_dialog "$INSTALL_TARGET as default?"; then
        set_default_shell fish
    fi

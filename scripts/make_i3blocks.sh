@@ -3,6 +3,8 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
+source $DIR/config.sh
+
 if [ "$1" = "build" ]; then
     depends="git ca-certificates build-essential pkg-config autoconf automake checkinstall"
     apt-get -q update
@@ -21,10 +23,10 @@ if [ "$1" = "build" ]; then
       --pkgversion=$VERSION \
       --default \
       --pakdir=. \
-      --instal=no
+      --instal=no \
+      make install-exec
 fi
 
 if [ "$1" = "install" ]; then
-    source $DIR/config.sh
     install_deb "i3blocks/i3blocks_*_amd64.deb"
 fi

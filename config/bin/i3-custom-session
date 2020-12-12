@@ -99,7 +99,11 @@ init_keyboard_layout() {
 
 init_compton() {
     echo "Start compton"
-    compton -b --config=$home/.config/compton/compton.conf
+    if (ps aux | grep compton | grep -v grep > /dev/null);then
+       echo "Already running"
+    else
+       compton -b --config=$home/.config/compton/compton.conf
+    fi
 }
 
 run_i3scripts() {
@@ -109,7 +113,7 @@ run_i3scripts() {
 
 user_session_start() {
     echo "Start gnome session"
-    gnome-session &
+    gnome-session --session=i3 &
     if [ -f /usr/lib/gnome-settings-daemon/gnome-settings-daemon ]; then
         echo "Start gnome-settings-daemon"
         gnome-settings-daemon &
@@ -120,6 +124,13 @@ user_session_start() {
             echo "Start $filename"
             eval $filename &
         done
+    fi
+    if [ -f /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 ]; then
+        if (ps aux | grep policykit | grep -v grep > /dev/null);then
+            echo "Policykit already running"
+        else
+            /usr/lib/policykit-1-gnome/polkit-gnome-authentication-agent-1 &
+        fi
     fi
 }
 
@@ -140,6 +151,9 @@ case "$1" in
             ;;
         session-quit)
             user_session_quit
+            ;;
+        i3-scripts)
+            run_i3scripts
             ;;
         display-switch)
             current=$(current_display_mode)

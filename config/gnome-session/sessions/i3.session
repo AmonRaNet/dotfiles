@@ -1,0 +1,5 @@
+[GNOME Session]
+Name=i3
+RequiredComponents=
+RequiredProviders=windowmanager;
+DefaultProvider-windowmanager=i3

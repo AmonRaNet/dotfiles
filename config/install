@@ -47,9 +47,6 @@ mark_done
 if app_exists "i3"; then
     echo_install "i3 config"
     validate_missing_init
-#    if ! test_command "i3 --version | grep gaps"; then
-#        missing="$missing i3-gaps"
-#    fi
     if ! test_command "ls /usr/share/notify-osd"; then
         missing="$missing notify-osd"
     fi
@@ -64,7 +61,7 @@ if app_exists "i3"; then
                   "gnome-session" \
                   "xautolock" \
                   "compton" \
-                  "rhythmbox-client" \
+                  "playerctl" \
                   "xrandr" \
                   "arandr" \
                   "scrot")
@@ -83,6 +80,7 @@ if app_exists "i3"; then
     echo_task "i3 custom scripts"
     sudo rm -vfR /usr/bin/i3-custom-*
     sudo cp -vR $DIR/bin/i3-custom-* /usr/bin
+    sudo cp -vR $DIR/gnome-session/* /usr/share/gnome-session
 
     echo_task "i3 config"
     copy_config i3
@@ -92,15 +90,16 @@ if app_exists "i3"; then
     (cd ~/.config/i3blocks/scripts/bandwidth2 ; make)
 
     echo_task "i3 related python modules"
-    sudo bash -c "pip3 install setuptools"
-    sudo bash -c "pip3 install i3ipc"
-    sudo bash -c "pip3 install fontawesome"
+    sudo bash -c "pip3 install --user setuptools --break-system-packages"
+    sudo bash -c "pip3 install --user i3ipc --break-system-packages"
+    sudo bash -c "pip3 install --user fontawesome --break-system-packages"
 
     echo_task "compton config"
     copy_config compton
 
     mark_done
 else
+    echo_install "i3 config"
     mark_skipped
 fi
 
@@ -109,6 +108,7 @@ if app_exists "terminator"; then
     copy_config terminator
     mark_done
 else
+    echo_install "terminator config"
     mark_skipped
 fi
 
@@ -118,6 +118,7 @@ if app_exists "gnome-terminal"; then
     dconf load /org/gnome/terminal/ < $DIR/gnome-terminal/settings_dump.txt
     mark_done
 else
+    echo_install "gnome-terminal config"
     mark_skipped
 fi
 
@@ -126,6 +127,7 @@ if app_exists "variety"; then
     copy_config variety
     mark_done
 else
+    echo_install "variety config"
     mark_skipped
 fi
 
@@ -153,6 +155,7 @@ set fish_pager_color_description brgrey
 set fish_pager_color_progress magenta"
     mark_done
 else
+    echo_install "prepare fish config"
     mark_skipped
 fi
 
@@ -167,6 +170,7 @@ if app_exists "git"; then
     touch ~/.gitignore
     mark_done
 else
+    echo_install "git config"
     mark_skipped
 fi
 
@@ -175,5 +179,6 @@ if app_exists "vim"; then
     cp -vR $DIR/vim/vimrc ~/.vimrc
     mark_done
 else
+    echo_install "vim config"
     mark_skipped
 fi

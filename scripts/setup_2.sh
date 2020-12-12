@@ -13,7 +13,6 @@ source $DIR/config.sh
 set +e
 choice=($(whiptail \
   --checklist "Utils setup (AmonRaNet)" 22 90 15 \
-  $(install_target vim) \
   $(install_target rofi) \
   $(install_target gnome-tweak-tool) \
   $(install_target indicator-sound-switcher) \
@@ -58,14 +57,16 @@ choice=($(whiptail \
   $(install_target rfid custom-rfid-tools) \
   $(install_target ripgrep ripgrep) \
   $(install_target vbox virtual-box) \
+  $(install_target qemu qemu-kvm) \
   $(install_target vsftpd ftp-server) \
   $(install_target samba smb-server) \
+  $(install_target spotify) \
+  $(install_target playerctl) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
 
-simple=("vim" \
-        "gnome-tweak-tool" \
+simple=("gnome-tweak-tool" \
         "arandr" \
         "numlockx" \
         "yad" \
@@ -84,6 +85,7 @@ simple=("vim" \
         "keepassx" \
         "kazam" \
         "blueproximity" \
+        "playerctl" \
         "vsftpd" \
         "samba" \
         "mosh")
@@ -100,12 +102,15 @@ if is_install "notify-osd"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install notify-osd
    sudo apt-get --assume-yes remove --purge dunst
+   target_done $INSTALL_TARGET
 fi
 
 if is_install "rofi"; then
    echo_install $INSTALL_TARGET
-   sudo add-apt-repository -y ppa:jasonpleau/rofi
-   sudo apt-get -q update
+   if ! is_ubuntu20_or_higher; then
+       sudo add-apt-repository -y ppa:jasonpleau/rofi
+       sudo apt-get -q update       
+   fi
    sudo apt-get --assume-yes --no-install-recommends install rofi
    rm -fR /tmp/rofi-themes
    git clone https://github.com/DaveDavenport/rofi-themes.git /tmp/rofi-themes
@@ -133,11 +138,21 @@ fi
 
 if is_install "wine"; then
    echo_install $INSTALL_TARGET
-   sudo dpkg --add-architecture i386
-   wget -q -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
-   sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install winehq-stable
+   if is_ubuntu20_or_higher; then
+      sudo dpkg --add-architecture i386
+      sudo mkdir -pm755 /etc/apt/keyrings
+      wget -O - https://dl.winehq.org/wine-builds/winehq.key | sudo gpg --dearmor -o /etc/apt/keyrings/winehq-archive.key -
+      sudo wget -NP /etc/apt/sources.list.d/ https://dl.winehq.org/wine-builds/ubuntu/dists/$(lsb_release -cs)/winehq-$(lsb_release -cs).sources
+      sudo apt-get -q update
+      sudo apt-get --assume-yes --no-install-recommends install winehq-stable
+   else
+      sudo dpkg --add-architecture i386
+      wget -q -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
+      sudo apt-add-repository "deb https://dl.winehq.org/wine-builds/ubuntu/ $(lsb_release -cs) main"
+      sudo apt-get -q update
+      sudo apt-get --assume-yes --no-install-recommends install libc6
+      sudo apt-get --assume-yes --no-install-recommends install winehq-stable
+   fi
    target_done $INSTALL_TARGET
 fi
 
@@ -158,7 +173,7 @@ fi
 
 if is_install "icdiff"; then
    echo_install $INSTALL_TARGET
-   pip install --user git+https://github.com/jeffkaufman/icdiff.git
+   pip3 install --user git+https://github.com/jeffkaufman/icdiff.git --break-system-packages
    git config --global icdiff.options '--highlight --line-numbers'
    target_done $INSTALL_TARGET
 fi
@@ -224,7 +239,7 @@ if is_install "gdrive"; then
    app_id="$(input_dialog "grive custom client_id" "")"
    secret_id="$(input_dialog "grive custom secret_id" "")"
    build_in_docker $DIR/make_grive.sh "$app_id" "$secret_id"
-   build_in_host $DIR/make_grivetools.sh
+   build_in_docker $DIR/make_grivetools.sh
 
    msg_dialog "Finish setup and exit setup application to continue!"
    /opt/thefanclub/grive-tools/grive-setup
@@ -256,15 +271,17 @@ fi
 
 if is_install "zeal"; then
    echo_install $INSTALL_TARGET
-   sudo apt-add-repository -y ppa:zeal-developers/ppa
-   sudo apt-get -q update
+   if ! is_ubuntu20_or_higher; then
+       sudo apt-add-repository -y ppa:zeal-developers/ppa
+       sudo apt-get -q update
+   fi
    sudo apt-get --assume-yes --no-install-recommends install zeal
    target_done $INSTALL_TARGET
 fi
 
 if is_install "bat"; then
    echo_install $INSTALL_TARGET
-   wget -N -O /tmp/bat_amd64.deb https://github.com/sharkdp/bat/releases/download/v0.12.1/bat_0.12.1_amd64.deb
+   wget -N -O /tmp/bat_amd64.deb https://github.com/sharkdp/bat/releases/download/v0.17.1/bat-musl_0.17.1_amd64.deb
    install_deb "/tmp/bat_amd64.deb"
    target_done $INSTALL_TARGET
 fi
@@ -303,9 +320,45 @@ fi
 
 if is_install "vbox"; then
    echo_install $INSTALL_TARGET
-   wget -q -O - https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo apt-key add -
-   echo 'deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian '$(lsb_release -cs)' contrib' | sudo tee /etc/apt/sources.list.d/oracle-vbox.list
+   if is_ubuntu20_or_higher; then
+      wget -O- https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo gpg --dearmor --yes --output /usr/share/keyrings/oracle-virtualbox-2016.gpg
+      echo "deb [arch=amd64 signed-by=/usr/share/keyrings/oracle-virtualbox-2016.gpg] http://download.virtualbox.org/virtualbox/debian $(lsb_release -cs) contrib" | sudo tee /etc/apt/sources.list.d/virtualbox.list
+      sudo apt-get -q update
+      sudo apt-get --assume-yes --no-install-recommends install virtualbox-7.1
+   else
+      wget -q -O - https://www.virtualbox.org/download/oracle_vbox_2016.asc | sudo apt-key add -
+      echo 'deb [arch=amd64] https://download.virtualbox.org/virtualbox/debian '$(lsb_release -cs)' contrib' | sudo tee /etc/apt/sources.list.d/oracle-vbox.list
+      sudo apt-get -q update
+      sudo apt-get --assume-yes --no-install-recommends install virtualbox-6.1
+   fi
+
+   local VBOX_VERSION=$(vboxmanage -v | cut -dr -f1)
+   wget -N -O /tmp/Oracle_VirtualBox_Extension_Pack.vbox-extpack https://download.virtualbox.org/virtualbox/$VBOX_VERSION/Oracle_VirtualBox_Extension_Pack-$VBOX_VERSION.vbox-extpack
+   sudo vboxmanage extpack install /tmp/Oracle_VirtualBox_Extension_Pack.vbox-extpack
+
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "qemu"; then
+   echo_install $INSTALL_TARGET
    sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install virtualbox-6.1
+   sudo apt-get --assume-yes --no-install-recommends install qemu-kvm virt-manager virt-viewer virtinst libvirt-clients bridge-utils libvirt-daemon-system
+   sudo systemctl enable --now libvirtd
+   if [[ "$(groups)" != *"kvm"* ]]; then
+        sudo usermod -aG kvm $USER
+        sudo usermod -aG libvirt $USER
+        msg_dialog "User added to kvm/libvirt group. Please logout and login again to continue"
+        target_done $INSTALL_TARGET
+        exit 1
+   fi
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "spotify"; then
+   echo_install $INSTALL_TARGET
+   wget -q -O - https://download.spotify.com/debian/pubkey_C85668DF69375001.gpg | sudo gpg --dearmor --yes -o /etc/apt/trusted.gpg.d/spotify.gpg
+   echo "deb http://repository.spotify.com stable non-free" | sudo tee /etc/apt/sources.list.d/spotify.list
+   sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install spotify-client
    target_done $INSTALL_TARGET
 fi

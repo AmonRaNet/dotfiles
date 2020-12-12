@@ -1,10 +1,5 @@
 #! /bin/bash
 
-if [ "$(id -u)" == "0" ]; then
-   echo "This script must be run as non-root" 1>&2
-   exit 1
-fi
-
 # Use colors, but only if connected to a terminal, and that terminal
 # supports them.
 if which tput >/dev/null 2>&1; then
@@ -135,34 +130,28 @@ build_in_docker() {
     echo_task "BUILD_IN_DOCKER"
     local make_script=$1
     local build_dir="/tmp/build_in_docker"
+    local entry_script=/tmp/build_in_docker_entry.sh
+    local ubuntu=$(lsb_release -cs)
     mkdir -p $build_dir
     sudo rm -rf $build_dir/*
     echo ${YELLOW}
+    echo "if $make_script build ${@:2}; then exit 0; fi
+          echo =============================================
+          echo \"Error detected. You still in docker bash - you can fix error manually\"
+          echo =============================================" > $entry_script
     docker run -it \
+           -v $DIR/config.sh:$DIR/config.sh:ro \
            -v $make_script:$make_script:ro \
+           -v $entry_script:$entry_script:ro \
            -v $build_dir:$build_dir:rw \
            -w $build_dir \
            --entrypoint "/bin/bash" \
-           ubuntu:$(lsb_release -cs) \
-           $make_script build ${@:2}
+           ubuntu:$ubuntu \
+           --rcfile $entry_script
     sudo chown -R --quiet $USER:$GROUPS $build_dir
     echo ${NORMAL}
     pushd .
     cd $build_dir
-    $make_script install
-    $make_script config
-    popd
-}
-
-build_in_host() {
-    echo_task "BUILD_IN_HOST"
-    local make_script=$1
-    local build_dir="/tmp/build_in_host"
-    mkdir -p $build_dir
-    rm -rf $build_dir/*
-    pushd .
-    cd $build_dir
-    $make_script build ${@:2}
     $make_script install
     $make_script config
     popd
@@ -203,11 +192,10 @@ is_ubuntu18() {
     return 1
 }
 
-# Apply sudo for terminal
-sudo -v
-
-# Check OS
-if ! is_ubuntu; then
-    msg_dialog "Only Ubuntu supported!"
-    exit 1
-fi
+is_ubuntu20_or_higher() {
+    local ubuntu=$(lsb_release -rs | awk -F '.' '{print $1}')
+    if [ "$ubuntu" -ge "20" ]; then
+        return
+    fi
+    return 1
+}

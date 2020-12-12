@@ -27,7 +27,7 @@ case "$1" in
             detach thunderbird -mail
             ;;
         player)
-            detach rhythmbox-client
+            detach spotify
             ;;
         calculator)
             detach gnome-calculator
@@ -63,22 +63,20 @@ case "$1" in
             exec pkill -SIGRTMIN+10 i3blocks
             ;;
         audio-play)
-            set +e
-            if ! rhythmbox-client --check-running; then
-                detach rhythmbox-client --play-uri=http://ubuntu.hbr1.com:19800/trance.ogg
-                exit
+            if (playerctl -l 2>&1 | grep -i -q "no players");then
+                detach spotify
+                sleep 3
             fi
-            set -e
-            rhythmbox-client --play-pause
+            playerctl play-pause
             ;;
         audio-pause)
-            rhythmbox-client --play-pause
+            playerctl play-pause
             ;;
         audio-next)
-            rhythmbox-client --next
+            playerctl next
             ;;
         audio-prev)
-            rhythmbox-client --previous
+            playerctl previous
             ;;
         *)
             echo "Unexpected arg $0"

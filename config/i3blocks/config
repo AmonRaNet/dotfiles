@@ -25,6 +25,7 @@ color=#00FF00
 interval=10
 
 [volume]
+MIXER=pulse
 LABEL=SOUND:
 color=#00FFFF
 interval=5
@@ -33,6 +34,7 @@ STEP=5%
 
 [volume-mic]
 command=$SCRIPT_DIR/volume/volume
+MIXER=pulse
 LABEL=SOUND-mic:
 color=#00FFAA
 interval=5

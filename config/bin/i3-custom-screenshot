@@ -21,6 +21,12 @@ notify () {
     notify-send --icon=dialog-information Screenshot "$1"
 }
 
+# sreenshot with flameshot
+if app_exists "flameshot"; then
+    flameshot gui
+    exit
+fi
+
 # screenshot with Lightshot (over wine)
 if app_exists "wine"; then
     home="$(readlink -f ~)"

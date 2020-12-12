@@ -29,13 +29,13 @@ choice=($(whiptail \
   $(install_target clang v-$clang_version) \
   $(install_target ccache) \
   $(install_target pre-commit) \
-  $(install_target icdiff) \
   $(install_target vim vim-code-completion) \
   $(install_target qtframework) \
   $(install_target qtcreator v-$qtcreator_version) \
   $(install_target qtspellcheck v-$qtcreator_spellcheck_version) \
   $(install_target code visual-studio-code) \
   $(install_target atom) \
+  $(install_target code) \
   $(install_target atompackages custom) \
   $(install_target pycharm) \
   $(install_target androidstudio) \
@@ -105,12 +105,7 @@ fi
 
 if is_install "pre-commit"; then
    echo_install $INSTALL_TARGET
-   pip install pre-commit
-fi
-
-if is_install "icdiff"; then
-   echo_install $INSTALL_TARGET
-   pip install icdiff
+   pip3 install --user pre-commit --break-system-packages
 fi
 
 if is_install "cmake"; then
@@ -204,8 +199,8 @@ if is_install "atompackages"; then
    apm install build-cmake
    apm install build-python
    apm install sublime-style-column-selection
-   sudo pip3 install pycodestyle
-   sudo pip3 install flake8
+   sudo pip3 install --user pycodestyle --break-system-packages
+   sudo pip3 install --user flake8 --break-system-packages
    target_done $INSTALL_TARGET
 fi
 
