@@ -203,9 +203,9 @@ is_ubuntu18() {
     return 1
 }
 
-is_ubuntu20() {
-    local ubuntu=$(lsb_release -cs)
-    if [ "$ubuntu" = "focal" ]; then
+is_ubuntu20_or_higher() {
+    local ubuntu=$(lsb_release -rs | awk -F '.' '{print $1}')
+    if [ "$ubuntu" -ge "20" ]; then
         return
     fi
     return 1
@@ -218,4 +218,16 @@ sudo -v
 if ! is_ubuntu; then
     msg_dialog "Only Ubuntu supported!"
     exit 1
+fi
+
+if is_ubuntu16; then
+    echo_install "Install for Ubuntu 16"
+fi
+
+if is_ubuntu18; then
+    echo_install "Install for Ubuntu 18"
+fi
+
+if is_ubuntu20_or_higher; then
+    echo_install "Install for Ubuntu 20 or higher"
 fi

@@ -49,7 +49,7 @@ set_default_shell() {
 if is_install "python2"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install python
-   if is_ubuntu20; then
+   if is_ubuntu20_or_higher; then
        wget -N -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
        python2 /tmp/get-pip.py
    else
@@ -184,9 +184,13 @@ if is_install "fish-shell"; then
    sudo rm -f ~/.config/fish/conf.d/omf.fish
    sudo rm -f ~/.config/fish/functions/fish_prompt.fish
    #fish
-   sudo apt-add-repository -y ppa:fish-shell/release-2
-   sudo apt-get -q update
-   sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   if is_ubuntu20_or_higher; then
+       sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   else
+       sudo apt-add-repository -y ppa:fish-shell/release-2
+       sudo apt-get -q update
+       sudo apt-get --assume-yes --no-install-recommends install fish fish-common
+   fi
    if yesno_dialog "$INSTALL_TARGET as default?"; then
        set_default_shell fish
    fi
