@@ -13,7 +13,8 @@ source $DIR/config.sh
 set +e
 choice=($(whiptail \
   --checklist "General tools setup (AmonRaNet)" 20 80 15 \
-  $(install_target python) \
+  $(install_target python2) \
+  $(install_target python3) \
   $(install_target docker) \
   $(install_target i3) \
   $(install_target i3bloks) \
@@ -45,13 +46,23 @@ set_default_shell() {
   sudo chsh -s $SHELL
 }
 
-if is_install "python"; then
+if is_install "python2"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install python
+   if is_ubuntu20; then
+       wget -N -O /tmp/get-pip.py https://bootstrap.pypa.io/get-pip.py
+       python2 /tmp/get-pip.py
+   else
+       sudo apt-get --assume-yes --no-install-recommends install python-pip
+       sudo bash -c "pip install --upgrade pip"
+   fi
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "python3"; then
+   echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install python3
-   sudo apt-get --assume-yes --no-install-recommends install python-pip
    sudo apt-get --assume-yes --no-install-recommends install python3-pip
-   sudo bash -c "pip install --upgrade pip"
    sudo bash -c "pip3 install --upgrade pip"
    target_done $INSTALL_TARGET
 fi
