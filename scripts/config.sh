@@ -203,6 +203,14 @@ is_ubuntu18() {
     return 1
 }
 
+is_ubuntu20() {
+    local ubuntu=$(lsb_release -cs)
+    if [ "$ubuntu" = "focal" ]; then
+        return
+    fi
+    return 1
+}
+
 # Apply sudo for terminal
 sudo -v
 
