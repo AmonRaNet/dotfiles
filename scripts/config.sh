@@ -1,10 +1,5 @@
 #! /bin/bash
 
-if [ "$(id -u)" == "0" ]; then
-   echo "This script must be run as non-root" 1>&2
-   exit 1
-fi
-
 # Use colors, but only if connected to a terminal, and that terminal
 # supports them.
 if which tput >/dev/null 2>&1; then
@@ -135,16 +130,23 @@ build_in_docker() {
     echo_task "BUILD_IN_DOCKER"
     local make_script=$1
     local build_dir="/tmp/build_in_docker"
+    local entry_script=/tmp/build_in_docker_entry.sh
     mkdir -p $build_dir
     sudo rm -rf $build_dir/*
     echo ${YELLOW}
+    echo "if $make_script build ${@:2}; then exit 0; fi
+          echo =============================================
+          echo \"Error detected. You still in docker bash - you can fix error manually\"
+          echo =============================================" > $entry_script
     docker run -it \
+           -v $DIR/config.sh:$DIR/config.sh:ro \
            -v $make_script:$make_script:ro \
+           -v $entry_script:$entry_script:ro \
            -v $build_dir:$build_dir:rw \
            -w $build_dir \
            --entrypoint "/bin/bash" \
            ubuntu:$(lsb_release -cs) \
-           $make_script build ${@:2}
+           --rcfile $entry_script
     sudo chown -R --quiet $USER:$GROUPS $build_dir
     echo ${NORMAL}
     pushd .
@@ -210,24 +212,3 @@ is_ubuntu20_or_higher() {
     fi
     return 1
 }
-
-# Apply sudo for terminal
-sudo -v
-
-# Check OS
-if ! is_ubuntu; then
-    msg_dialog "Only Ubuntu supported!"
-    exit 1
-fi
-
-if is_ubuntu16; then
-    echo_install "Install for Ubuntu 16"
-fi
-
-if is_ubuntu18; then
-    echo_install "Install for Ubuntu 18"
-fi
-
-if is_ubuntu20_or_higher; then
-    echo_install "Install for Ubuntu 20 or higher"
-fi

@@ -3,6 +3,8 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
+source $DIR/config.sh
+
 is_ubuntu16() {
     local ubuntu=$(lsb_release -cs)
     if [ "$ubuntu" = "xenial" ]; then
