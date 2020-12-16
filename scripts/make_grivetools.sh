@@ -3,6 +3,8 @@ set -e
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
+source $DIR/config.sh
+
 if [ "$1" = "build" ]; then
     git clone https://github.com/AmonRaNet/grive-tools.git --branch AmonRaNet grive-tools
     cd grive-tools

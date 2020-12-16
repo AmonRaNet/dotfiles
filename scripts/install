@@ -11,6 +11,30 @@ fi
 
 source $DIR/config.sh
 
+# Check OS
+if ! is_ubuntu; then
+    msg_dialog "Only Ubuntu supported!"
+    exit 1
+fi
+
+# Apply sudo for terminal
+if [ "$(id -u)" == "0" ]; then
+   echo "This script must be run as non-root" 1>&2
+   exit 1
+fi
+sudo -v
+
+# Welcome
+if is_ubuntu16; then
+    echo_install "Install for Ubuntu 16"
+fi
+if is_ubuntu18; then
+    echo_install "Install for Ubuntu 18"
+fi
+if is_ubuntu20_or_higher; then
+    echo_install "Install for Ubuntu 20 or higher"
+fi
+
 for filename in $DIR/setup_*.sh
 do
     [ -f "$filename" ] || continue

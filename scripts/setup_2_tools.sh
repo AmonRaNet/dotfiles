@@ -104,8 +104,10 @@ fi
 
 if is_install "rofi"; then
    echo_install $INSTALL_TARGET
-   sudo add-apt-repository -y ppa:jasonpleau/rofi
-   sudo apt-get -q update
+   if ! is_ubuntu20_or_higher; then
+       sudo add-apt-repository -y ppa:jasonpleau/rofi
+       sudo apt-get -q update       
+   fi
    sudo apt-get --assume-yes --no-install-recommends install rofi
    rm -fR /tmp/rofi-themes
    git clone https://github.com/DaveDavenport/rofi-themes.git /tmp/rofi-themes
