@@ -139,6 +139,7 @@ if is_install "wine"; then
    wget -q -O - https://dl.winehq.org/wine-builds/winehq.key | sudo apt-key add -
    sudo apt-add-repository 'deb https://dl.winehq.org/wine-builds/ubuntu/ xenial main'
    sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install libc6
    sudo apt-get --assume-yes --no-install-recommends install winehq-stable
    target_done $INSTALL_TARGET
 fi
@@ -258,15 +259,17 @@ fi
 
 if is_install "zeal"; then
    echo_install $INSTALL_TARGET
-   sudo apt-add-repository -y ppa:zeal-developers/ppa
-   sudo apt-get -q update
+   if ! is_ubuntu20_or_higher; then
+       sudo apt-add-repository -y ppa:zeal-developers/ppa
+       sudo apt-get -q update
+   fi
    sudo apt-get --assume-yes --no-install-recommends install zeal
    target_done $INSTALL_TARGET
 fi
 
 if is_install "bat"; then
    echo_install $INSTALL_TARGET
-   wget -N -O /tmp/bat_amd64.deb https://github.com/sharkdp/bat/releases/download/v0.12.1/bat_0.12.1_amd64.deb
+   wget -N -O /tmp/bat_amd64.deb https://github.com/sharkdp/bat/releases/download/v0.17.1/bat-musl_0.17.1_amd64.deb
    install_deb "/tmp/bat_amd64.deb"
    target_done $INSTALL_TARGET
 fi
