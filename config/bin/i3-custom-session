@@ -14,11 +14,15 @@ if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
 fi
 
 home="$(readlink -f ~)"
-display_mode_path=~/.screenlayout
-last_display_mode_path=~/.screenlayout
-last_display_mode_file=$last_display_mode_path/display_mode
-autolock_file=$last_display_mode_path/auto_lock
-mkdir -p $last_display_mode_path && touch $last_display_mode_file
+i3_session_path=$home/.i3_session
+display_mode_path=$i3_session_path/screenlayout
+last_display_mode_file=$i3_session_path/display_mode
+autolock_file=$i3_session_path/auto_lock
+
+mkdir -p $i3_session_path
+mkdir -p $display_mode_path
+touch $last_display_mode_file
+
 i3_restart_delay=2
 i3_scripts_delay=3
 
@@ -86,7 +90,7 @@ apply_autolock() {
 }
 
 init_keyboard_layout() {
-    local layout="de,us,ru"
+    local layout="us,de,ru"
     local toggle="alt_shift_toggle"
     echo "Set keyboard layout $layout with $toggle"
     setxkbmap -model pc105 -layout $layout -option grp:$toggle
