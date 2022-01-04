@@ -28,6 +28,8 @@ choice=($(whiptail \
   $(install_target gcc v-$gcc_version) \
   $(install_target clang v-$clang_version) \
   $(install_target ccache) \
+  $(install_target pre-commit) \
+  $(install_target icdiff) \
   $(install_target qtframework) \
   $(install_target qtcreator v-$qtcreator_version) \
   $(install_target qtspellcheck v-$qtcreator_spellcheck_version) \
@@ -102,6 +104,16 @@ if is_install "ccache"; then
     target_done $INSTALL_TARGET
 fi
 
+if is_install "pre-commit"; then
+   echo_install $INSTALL_TARGET
+   pip install pre-commit
+fi
+
+if is_install "icdiff"; then
+   echo_install $INSTALL_TARGET
+   pip install icdiff
+fi
+
 if is_install "cmake"; then
    echo_install $INSTALL_TARGET
    build_in_docker $DIR/make_cmake.sh
@@ -122,7 +134,7 @@ if is_install "qtframework"; then
    wget -N -O /tmp/qt-x64-online.run http://ftp.fau.de/qtproject/official_releases/online_installers/qt-unified-linux-x64-online.run
    sudo chmod +x /tmp/qt-x64-online.run
    /tmp/qt-x64-online.run
-   if yesno_dialog "Install libgl-meaa?"; then
+   if yesno_dialog "Install libgl-mesa?"; then
        sudo apt-get --assume-yes --no-install-recommends install libgl1-mesa-dev
    fi
    target_done $INSTALL_TARGET

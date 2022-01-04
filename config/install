@@ -47,13 +47,14 @@ mark_done
 if app_exists "i3"; then
     echo_install "i3 config"
     validate_missing_init
-    if ! test_command "i3 --version | grep gaps"; then
-        missing="$missing i3-gaps"
-    fi
+#    if ! test_command "i3 --version | grep gaps"; then
+#        missing="$missing i3-gaps"
+#    fi
     if ! test_command "ls /usr/share/notify-osd"; then
         missing="$missing notify-osd"
     fi
     dependencies=("dmenu" \
+                  "i3" \
                   "i3lock" \
                   "i3status" \
                   "i3blocks" \

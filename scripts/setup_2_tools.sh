@@ -58,6 +58,8 @@ choice=($(whiptail \
   $(install_target rfid custom-rfid-tools) \
   $(install_target ripgrep ripgrep) \
   $(install_target vbox virtual-box) \
+  $(install_target vsftpd ftp-server) \
+  $(install_target samba smb-server) \
   3>&1 1>&2 2>&3))
 no_choice_exit
 set -e
@@ -71,7 +73,6 @@ simple=("vim" \
         "kbdd" \
         "xautolock" \
         "compton" \
-        "notify-osd" \
         "sysstat" \
         "default-jre" \
         "default-jdk" \
@@ -83,6 +84,8 @@ simple=("vim" \
         "keepassx" \
         "kazam" \
         "blueproximity" \
+        "vsftpd" \
+        "samba" \
         "mosh")
 for i in ${simple[@]}
 do
@@ -92,6 +95,12 @@ do
        target_done $INSTALL_TARGET
    fi
 done
+
+if is_install "notify-osd"; then
+   echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install notify-osd
+   sudo apt-get --assume-yes remove --purge dunst
+fi
 
 if is_install "rofi"; then
    echo_install $INSTALL_TARGET

@@ -148,7 +148,7 @@ if is_install "fish-shell"; then
    fish -c "echo 'Create fish config'"
    source-auto enable fish
    #oh-my-fish
-   wget -N -O /tmp/omf-install.fish https://get.oh-my.fish
+   wget --no-check-certificate -N -O /tmp/omf-install.fish https://get.oh-my.fish
    fish /tmp/omf-install.fish --noninteractive --path=~/.local/share/omf --config=~/.config/omf
    #oh-my-fish (plugins)
    fish -c "omf install bass"

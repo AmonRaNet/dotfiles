@@ -17,7 +17,7 @@ if [ "$1" = "build" ]; then
     autoconf automake checkinstall"
     apt-get update
     apt-get --assume-yes --no-install-recommends install $depends
-    git clone https://www.github.com/Airblader/i3 i3gaps
+    git clone --branch "4.18.3" https://www.github.com/Airblader/i3 i3gaps
     cd i3gaps
     VERSION=$(git describe --tags --always)
     autoreconf --force --install
