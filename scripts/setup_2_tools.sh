@@ -165,6 +165,12 @@ fi
 
 if is_install "lightshot"; then
    echo_install $INSTALL_TARGET
+   if is_ubuntu18; then
+     wget -N -O /tmp/libpng12-0_amd64.deb http://security.ubuntu.com/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1.1_amd64.deb
+     wget -N -O /tmp/libpng12-0_i386.deb http://security.ubuntu.com/ubuntu/pool/main/libp/libpng/libpng12-0_1.2.54-1ubuntu1.1_i386.deb
+     install_deb "/tmp/libpng12-0_amd64.deb"
+     install_deb "/tmp/libpng12-0_i386.deb"
+   fi
    wget -N -O /tmp/setup-lightshot.exe https://app.prntscr.com/build/setup-lightshot.exe
    wine /tmp/setup-lightshot.exe
    target_done $INSTALL_TARGET
