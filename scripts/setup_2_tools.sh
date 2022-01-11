@@ -210,6 +210,7 @@ fi
 if is_install "thunar"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install thunar
+   sudo apt-get --assume-yes --no-install-recommends install thunar-archive-plugin
    sudo apt-get --assume-yes --no-install-recommends install gnome-icon-theme
    target_done $INSTALL_TARGET
 fi
