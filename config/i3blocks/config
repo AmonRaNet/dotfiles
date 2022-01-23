@@ -3,6 +3,16 @@ separator=true
 separator_block_width=35
 markup=pango
 
+[system]
+command=hostnamectl | grep "Operating System"
+color=#ffff00
+interval=once
+
+[login]
+command=echo "HOME: $(whoami)"
+color=#ffff00
+interval=once
+
 [iface]
 label=NETWORK:
 color=#00FF00
@@ -11,6 +21,7 @@ interval=10
 [iface]
 IFACE=wlp0s20f3
 label=WIFI:
+color=#00FF00
 interval=10
 
 [volume]
@@ -23,7 +34,7 @@ STEP=5%
 [volume-mic]
 command=$SCRIPT_DIR/volume/volume
 LABEL=SOUND-mic:
-color=#00FF55
+color=#00FFAA
 interval=5
 signal=10
 STEP=5%
@@ -44,7 +55,7 @@ interval=5
 
 [kbdd_layout]
 label=LAYOUT:
-color=#ff9900
+color=#91ff00
 interval=persist
 separator_block_width=5
 
