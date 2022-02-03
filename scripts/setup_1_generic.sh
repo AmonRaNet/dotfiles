@@ -18,10 +18,12 @@ choice=($(whiptail \
   $(install_target i3) \
   $(install_target i3bloks) \
   $(install_target i3gaps) \
+  $(install_target vid) \
   $(install_target terminator) \
   $(install_target gnome-terminal) \
   $(install_target awesome-fonts) \
   $(install_target powerline-fonts) \
+  $(install_target nerd-fonts) \
   $(install_target fish-shell) \
   $(install_target zsh-shell) \
   $(install_target fzf fuzzy-finder) \
@@ -91,6 +93,26 @@ if is_install "i3bloks"; then
    target_done $INSTALL_TARGET
 fi
 
+if is_install "vim"; then
+   echo_install $INSTALL_TARGET
+
+   sudo add-apt-repository -y ppa:jonathonf/vim
+   sudo apt-get -q update
+   sudo apt-get --assume-yes --no-install-recommends install vim
+
+   sudo rm -fR  ~/.vim/pack/amonranet/
+   git clone https://github.com/vim-airline/vim-airline.git ~/.vim/pack/amonranet/start/vim-airline
+   git clone https://github.com/junegunn/fzf.vim.git ~/.vim/pack/amonranet/start/fzf.vim
+   git clone https://github.com/airblade/vim-gitgutter.git ~/.vim/pack/amonranet/start/vim-gitgutter
+   git clone https://github.com/voldikss/vim-floaterm.git ~/.vim/pack/amonranet/start/vim-floaterm
+   git clone https://github.com/scrooloose/nerdtree.git ~/.vim/pack/amonranet/start/nerdtree
+   git clone https://github.com/Xuyuanp/nerdtree-git-plugin.git ~/.vim/pack/amonranet/start/nerdtree-git-plugin
+   git clone https://github.com/ryanoasis/vim-devicons.git ~/.vim/pack/amonranet/start/vim-devicons
+   git clone https://github.com/tiagofumo/vim-nerdtree-syntax-highlight.git ~/.vim/pack/amonranet/start/vim-nerdtree-syntax-highlight
+
+   target_done $INSTALL_TARGET
+fi
+
 if is_install "terminator"; then
    echo_install $INSTALL_TARGET
    sudo apt-get --assume-yes --no-install-recommends install terminator
@@ -128,6 +150,14 @@ if is_install "powerline-fonts"; then
    wget -N -O /tmp/powerline-fonts.zip https://codeload.github.com/powerline/fonts/zip/master
    unzip -o /tmp/powerline-fonts.zip -d /tmp/powerline-fonts
    bash /tmp/powerline-fonts/fonts-master/install.sh
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "nerd-fonts"; then
+   echo_install $INSTALL_TARGET
+   wget -N -O /tmp/nerd-fonts.zip https://github.com/ryanoasis/nerd-fonts/releases/download/v2.1.0/DroidSansMono.zip
+   unzip -o /tmp/nerd-fonts.zip -d ~/.fonts
+   fc-cache -fv
    target_done $INSTALL_TARGET
 fi
 

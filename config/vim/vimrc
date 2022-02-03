@@ -1,0 +1,53 @@
+let mapleader = " "
+set number
+set shell=/usr/bin/fish
+set mouse=a
+
+autocmd BufEnter * silent! lcd %:p:h
+
+nmap <F2> :NERDTreeToggle<CR>
+nnoremap <leader>n :NERDTreeFocus<CR>
+
+nnoremap <leader><down> :resize -5<CR>
+nnoremap <leader><up> :resize +5<CR>
+nnoremap <leader><left> :vertical:resize -5<CR>
+nnoremap <leader><right> :vertical:resize +5<CR>
+
+nnoremap <C-A-up> :m -2<CR>
+nnoremap <C-A-down> :m +1<CR>
+
+nnoremap <C-S-Tab> :Windows<CR>
+nnoremap <C-S-up> :winc k<CR>
+nnoremap <C-S-down> :winc j<CR>
+nnoremap <C-S-left> :winc h<CR>
+nnoremap <C-S-right> :winc l<CR>
+
+map <leader>[ :tabp<cr>
+map <leader>] :tabn<cr>
+
+map <leader>f :Files<cr>
+map <leader>g :Rg<cr>
+
+inoremap <S-Tab> <C-V><Tab>
+
+let g:airline_powerline_fonts=1
+let g:airline#extensions#tabline#enabled = 1
+
+set rtp+=~/.fzf
+set grepprg=rg\ --vimgrep\ --smart-case\ --follow
+let $FZF_DEFAULT_OPTS="--bind \"ctrl-n:preview-down,ctrl-p:preview-up\""
+
+let g:floaterm_keymap_toggle = "<F12>"
+let g:floaterm_width = 0.9
+let g:floaterm_height = 0.9
+let g:floaterm_autoclose = 2
+
+:highlight SignColumn ctermbg=black
+:highlight GitGutterAdd    guifg=#009900 ctermfg=2
+:highlight GitGutterChange guifg=#bbbb00 ctermfg=3
+:highlight GitGutterDelete guifg=#ff2222 ctermfg=1
+
+filetype plugin indent on
+set tabstop=4
+set shiftwidth=4
+set expandtab

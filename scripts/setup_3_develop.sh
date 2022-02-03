@@ -30,6 +30,7 @@ choice=($(whiptail \
   $(install_target ccache) \
   $(install_target pre-commit) \
   $(install_target icdiff) \
+  $(install_target vim vim-code-completion) \
   $(install_target qtframework) \
   $(install_target qtcreator v-$qtcreator_version) \
   $(install_target qtspellcheck v-$qtcreator_spellcheck_version) \
@@ -126,6 +127,19 @@ if is_install "bazel"; then
    sudo add-apt-repository -y "deb [arch=amd64] https://storage.googleapis.com/bazel-apt stable jdk1.8"
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install bazel
+   target_done $INSTALL_TARGET
+fi
+
+if is_install "vim"; then
+   echo_install $INSTALL_TARGET
+   sudo apt-get --assume-yes --no-install-recommends install python3-dev
+   sudo rm -fR ~/.vim/pack/amonranet/start/YouCompleteMe
+   git clone https://github.com/ycm-core/YouCompleteMe.git ~/.vim/pack/amonranet/start/YouCompleteMe
+   pushd .
+   cd ~/.vim/pack/amonranet/start/YouCompleteMe
+   git submodule update --init --recursive
+   python3 install.py --clangd-completer
+   popd
    target_done $INSTALL_TARGET
 fi
 

@@ -168,3 +168,11 @@ if app_exists "git"; then
 else
     mark_skipped
 fi
+
+if app_exists "vim"; then
+    echo_install "vim config"
+    cp -vR $DIR/vim/vimrc ~/.vimrc
+    mark_done
+else
+    mark_skipped
+fi
