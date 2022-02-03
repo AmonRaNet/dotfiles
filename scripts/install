@@ -31,7 +31,7 @@ set -e
 echo_install "basic tools"
 echo_task "prepare ubuntu"
 if is_ubuntu18; then
-    sudo add-apt-repository universe
+    sudo add-apt-repository -y universe
 fi
 echo_task "source-auto"
 $DIR/source-auto/install

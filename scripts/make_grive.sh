@@ -12,7 +12,7 @@ is_ubuntu16() {
 }
 
 if [ "$1" = "build" ]; then
-    apt-get update
+    apt-get -q update
     apt-get --assume-yes --no-install-recommends install lsb-release
     if is_ubuntu16; then
         depends="git ca-certificates build-essential cmake libgcrypt11-dev libyajl-dev \

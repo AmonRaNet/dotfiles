@@ -5,7 +5,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$1" = "build" ]; then
     depends="git ca-certificates build-essential libssl-dev checkinstall"
-    apt-get update
+    apt-get -q update
     apt-get --assume-yes --no-install-recommends install $depends
     git clone https://github.com/Kitware/CMake --branch release cmake
     cd cmake

@@ -4,7 +4,7 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 
 if [ "$1" = "build" ]; then
-    apt-get update
+    apt-get -q update
     apt-get --assume-yes --no-install-recommends install software-properties-common
     add-apt-repository -y ppa:aguignard/ppa
     depends="git ca-certificates build-essential
@@ -15,7 +15,7 @@ if [ "$1" = "build" ]; then
     libxcb-xkb-dev libxkbcommon-dev libxkbcommon-x11-dev
     libxcb-xrm-dev libxcb-shape0-dev
     autoconf automake checkinstall"
-    apt-get update
+    apt-get -q update
     apt-get --assume-yes --no-install-recommends install $depends
     git clone --branch "4.18.3" https://www.github.com/Airblader/i3 i3gaps
     cd i3gaps

@@ -54,7 +54,7 @@ if is_install "gcc"; then
     if is_ubuntu16; then
         sudo add-apt-repository ppa:jonathonf/gcc
     fi
-    sudo apt-get update
+    sudo apt-get -q update
     sudo apt-get --assume-yes --no-install-recommends install gcc-${gcc_version} g++-${gcc_version}
     sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-${gcc_version} 1000
     sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-${gcc_version} 1000
@@ -74,7 +74,7 @@ if is_install "clang"; then
           deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-9 main \n \
           " |  sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
     wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
-    sudo apt-get update
+    sudo apt-get -q update
 
     sudo apt-get --assume-yes --no-install-recommends install clang-$clang_version
     sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-$clang_version 1000
@@ -99,7 +99,7 @@ if is_install "ccache"; then
     sudo /usr/sbin/update-ccache-symlinks
     ccache --max-size=50G
     source-auto script bash ccache "export PATH=\"/usr/lib/ccache:\$PATH\""
-    source-auto script fish ccache "set PATH /usr/lib/ccache \$PATH"
+    source-auto script fish ccache "set -gx PATH /usr/lib/ccache \$PATH"
     source-auto script zsh  ccache "export PATH=\"/usr/lib/ccache:\$PATH\""
     target_done $INSTALL_TARGET
 fi

@@ -58,7 +58,7 @@ if is_install "docker"; then
    echo_install $INSTALL_TARGET
    wget -q -O - https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
    sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) stable"
-   sudo apt-get update
+   sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends --allow-unauthenticated install docker-ce
    if [[ "$(groups)" != *"docker"* ]]; then
         sudo usermod -a -G docker $USER
