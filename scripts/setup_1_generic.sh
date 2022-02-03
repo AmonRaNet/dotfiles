@@ -110,6 +110,10 @@ if is_install "vim"; then
    git clone https://github.com/ryanoasis/vim-devicons.git ~/.vim/pack/amonranet/start/vim-devicons
    git clone https://github.com/tiagofumo/vim-nerdtree-syntax-highlight.git ~/.vim/pack/amonranet/start/vim-nerdtree-syntax-highlight
 
+   if yesno_dialog "$INSTALL_TARGET as default?"; then
+       sudo update-alternatives --install /usr/bin/editor editor /usr/bin/vim 100
+   fi
+
    target_done $INSTALL_TARGET
 fi
 
