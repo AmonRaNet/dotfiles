@@ -18,7 +18,7 @@ choice=($(whiptail \
   $(install_target i3) \
   $(install_target i3bloks) \
   $(install_target i3gaps) \
-  $(install_target vid) \
+  $(install_target vim) \
   $(install_target terminator) \
   $(install_target gnome-terminal) \
   $(install_target awesome-fonts) \
@@ -100,7 +100,7 @@ if is_install "vim"; then
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install vim
 
-   sudo rm -fR  ~/.vim/pack/amonranet/
+   sudo rm -fR ~/.vim/pack/amonranet/
    git clone https://github.com/vim-airline/vim-airline.git ~/.vim/pack/amonranet/start/vim-airline
    git clone https://github.com/junegunn/fzf.vim.git ~/.vim/pack/amonranet/start/fzf.vim
    git clone https://github.com/airblade/vim-gitgutter.git ~/.vim/pack/amonranet/start/vim-gitgutter
