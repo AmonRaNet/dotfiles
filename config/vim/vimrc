@@ -1,38 +1,79 @@
 let mapleader = " "
 set number
 set shell=/usr/bin/fish
-set mouse=a
+set ignorecase
+set smartcase
 
-autocmd BufEnter * silent! lcd %:p:h
+if has("autocmd")
+  " current directory to buffer
+  autocmd BufEnter * silent! lcd %:p:h
 
-nmap <F2> :NERDTreeToggle<CR>
-nnoremap <leader>n :NERDTreeFocus<CR>
+  " current line highlight for insert mode
+  autocmd InsertEnter * set cul
+  autocmd InsertLeave * set nocul
 
-nnoremap <leader><down> :resize -5<CR>
-nnoremap <leader><up> :resize +5<CR>
-nnoremap <leader><left> :vertical:resize -5<CR>
-nnoremap <leader><right> :vertical:resize +5<CR>
+  " cursor for insert and normal mode
+  au VimEnter,InsertLeave * silent execute '!echo -ne "\e[2 q"' | redraw!
+  au InsertEnter,InsertChange *
+    \ if v:insertmode == 'i' |
+    \   silent execute '!echo -ne "\e[5 q"' | redraw! |
+    \ elseif v:insertmode == 'r' |
+    \   silent execute '!echo -ne "\e[3 q"' | redraw! |
+    \ endif
+  au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
+endif
 
-nnoremap <C-A-up> :m -2<CR>
-nnoremap <C-A-down> :m +1<CR>
+" NERD toogle and focus
+noremap <F2> :NERDTreeToggle<CR>
+noremap <leader>n :NERDTreeFocus<CR>
 
-nnoremap <C-S-Tab> :Windows<CR>
-nnoremap <C-S-up> :winc k<CR>
-nnoremap <C-S-down> :winc j<CR>
-nnoremap <C-S-left> :winc h<CR>
-nnoremap <C-S-right> :winc l<CR>
+" show line numbers toogle
+noremap <leader>l :set number!<CR>
+" enable mouse mode toogle
+noremap <leader>m :exec &mouse!=""? "set mouse=" : "set mouse=a"<CR>
+" show whitespaces
+noremap <leader>w :set list!<CR>
 
-map <leader>[ :tabp<cr>
-map <leader>] :tabn<cr>
+" change window size
+noremap <leader><down> :resize -5<CR>
+noremap <leader><up> :resize +5<CR>
+noremap <leader><left> :vertical:resize -5<CR>
+noremap <leader><right> :vertical:resize +5<CR>
 
-map <leader>f :Files<cr>
-map <leader>g :Rg<cr>
+" move line up and down
+noremap <C-A-up> :m -2<CR>
+noremap <C-A-down> :m +1<CR>
 
+" select window
+noremap <C-S-a> :Windows<CR>
+
+" move between window
+noremap <C-S-up> :winc k<CR>
+noremap <C-S-down> :winc j<CR>
+noremap <C-S-left> :winc h<CR>
+noremap <C-S-right> :winc l<CR>
+
+" change tabs
+noremap <leader>[ :tabp<cr>
+noremap <leader>] :tabn<cr>
+
+" search files
+noremap <leader>f :Files<cr>
+" search in files
+noremap <leader>g :Rg<cr>
+
+" insert real tab
 inoremap <S-Tab> <C-V><Tab>
 
+" yank to clipboard
+vnoremap <S-y> y :silent call system('xclip', @0)<CR>
+
+" whitespace chars
+set listchars=eol:¬,tab:>→,trail:~,extends:>,precedes:<,space:·
+
+" plugins settings
 let g:airline_powerline_fonts=1
 let g:airline#extensions#tabline#enabled = 1
-
 set rtp+=~/.fzf
 set grepprg=rg\ --vimgrep\ --smart-case\ --follow
 let $FZF_DEFAULT_OPTS="--bind \"ctrl-n:preview-down,ctrl-p:preview-up\""
@@ -42,12 +83,20 @@ let g:floaterm_width = 0.9
 let g:floaterm_height = 0.9
 let g:floaterm_autoclose = 2
 
+" colors
 :highlight SignColumn ctermbg=black
 :highlight GitGutterAdd    guifg=#009900 ctermfg=2
 :highlight GitGutterChange guifg=#bbbb00 ctermfg=3
 :highlight GitGutterDelete guifg=#ff2222 ctermfg=1
 
+:highlight DiffAdd    cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+:highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+:highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
+:highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Red
+
+" spaces instead of tab
 filetype plugin indent on
 set tabstop=4
 set shiftwidth=4
 set expandtab
+

@@ -163,6 +163,7 @@ if app_exists "git"; then
     git config --global core.excludesfile '~/.gitignore'
     git config --global credential.helper cache
     git config --global credential.helper 'cache --timeout=600'
+    git config --global merge.tool vimdiff
     touch ~/.gitignore
     mark_done
 else
