@@ -41,8 +41,9 @@ set_default_terminal() {
 
 set_default_shell() {
   local SHELL=$(which $1)
-  sudo echo $SHELL | sudo tee -a /etc/shells
+  sudo echo "$SHELL" | sudo tee -a /etc/shells
   sudo chsh -s $SHELL
+  sudo echo "export SHELL=$SHELL" | sudo tee -a ~/.profiles
 }
 
 if is_install "python"; then
@@ -112,6 +113,7 @@ if is_install "vim"; then
 
    if yesno_dialog "$INSTALL_TARGET as default?"; then
        sudo update-alternatives --install /usr/bin/editor editor /usr/bin/vim 100
+       sudo echo "export EDITOR=/usr/bin/vim" | sudo tee -a ~/.profiles
    fi
 
    target_done $INSTALL_TARGET
