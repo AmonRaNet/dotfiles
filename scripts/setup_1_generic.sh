@@ -175,7 +175,7 @@ if is_install "fish-shell"; then
    sudo rm -f ~/.config/fish/conf.d/omf.fish
    sudo rm -f ~/.config/fish/functions/fish_prompt.fish
    #fish
-   sudo apt-add-repository -y ppa:fish-shell/release-2
+   sudo apt-add-repository -y ppa:fish-shell/release-3
    sudo apt-get -q update
    sudo apt-get --assume-yes --no-install-recommends install fish fish-common
    if yesno_dialog "$INSTALL_TARGET as default?"; then
