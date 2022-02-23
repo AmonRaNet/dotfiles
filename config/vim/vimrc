@@ -33,6 +33,8 @@ noremap <leader>l :set number!<CR>
 noremap <leader>m :exec &mouse!=""? "set mouse=" : "set mouse=a"<CR>
 " show whitespaces
 noremap <leader>w :set list!<CR>
+" show git diff toogle
+noremap <leader>d :GitGutterToggle<CR>
 
 " change window size
 noremap <leader><down> :resize -5<CR>
@@ -93,6 +95,8 @@ let g:floaterm_autoclose = 2
 :highlight DiffDelete cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
 :highlight DiffChange cterm=bold ctermfg=10 ctermbg=17 gui=none guifg=bg guibg=Red
 :highlight DiffText   cterm=bold ctermfg=10 ctermbg=88 gui=none guifg=bg guibg=Red
+
+:highlight Comment ctermfg=LightBlue
 
 " spaces instead of tab
 filetype plugin indent on
