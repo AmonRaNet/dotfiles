@@ -144,6 +144,7 @@ bar {
 }
 bindsym --release Caps_Lock exec pkill -SIGRTMIN+11 i3blocks
 bindsym --release Num_Lock  exec pkill -SIGRTMIN+11 i3blocks
+
 bar {
     id bar_monitor
     mode hide
@@ -311,6 +312,7 @@ for_window [window_type="dialog"] floating enable
 for_window [window_type="menu"] floating enable
 for_window [class="(?i)keepassx"] floating enable, sticky enable
 for_window [class="(?i)gnome-system-monitor"] floating enable, sticky enable
+for_window [class="(?i)gnome-calculator"] floating enable, sticky enable
 for_window [class="(?i)arandr"] floating enable, sticky enable
 for_window [class="(?i)kazam"] floating enable
 for_window [class="(?i)zeal"] floating enable
