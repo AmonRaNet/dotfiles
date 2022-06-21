@@ -23,18 +23,33 @@ if has("autocmd")
   au VimLeave * silent execute '!echo -ne "\e[ q"' | redraw!
 endif
 
-" NERD toogle and focus
+" NERD toggle and focus
 noremap <F2> :NERDTreeToggle<CR>
 noremap <leader>n :NERDTreeFocus<CR>
 
-" show line numbers toogle
-noremap <leader>l :set number!<CR>
-" enable mouse mode toogle
+" show line numbers toggle
+noremap <leader>l :set number!<CR><Bar>:echo "Line numbers: " . strpart("OffOn", 3 * &number, 3)<CR>
+" enable mouse mode toggle
 noremap <leader>m :exec &mouse!=""? "set mouse=" : "set mouse=a"<CR>
 " show whitespaces
-noremap <leader>w :set list!<CR>
-" show git diff toogle
+noremap <leader>w :set list!<CR><Bar>:echo "Whitespaces: " . strpart("OffOn", 3 * &list, 3)<CR>
+" show git diff toggle
 noremap <leader>d :GitGutterToggle<CR>
+
+" spellcheck
+if has("spell")
+  " turn spelling on by default
+  set spell
+
+  " toggle spelling with F4 key
+  noremap <leader>s :set spell!<CR><Bar>:echo "Spell Check: " . strpart("OffOn", 3 * &spell, 3)<CR>
+
+  " they were using white on white
+  highlight PmenuSel ctermfg=black ctermbg=lightgray
+
+  " limit it to just the top 10 items
+  set sps=best,10
+endif
 
 " change window size
 noremap <leader><down> :resize -5<CR>
