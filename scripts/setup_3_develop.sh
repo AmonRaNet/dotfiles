@@ -17,7 +17,7 @@ qtcreator_spellcheck_libhunspell_version=1.7
 libhunspell_version=1.7-0
 
 gcc_version=8
-clang_version=9
+clang_version=15
 
 set +e
 choice=($(whiptail \
@@ -69,10 +69,8 @@ if is_install "clang"; then
     ubuntu=$(lsb_release -cs)
     echo -e "deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
           deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
-          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-8 main \n \
-          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-8 main \n \
-          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-9 main \n \
-          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-9 main \n \
+          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
+          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
           " |  sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
     wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
     sudo apt-get -q update
