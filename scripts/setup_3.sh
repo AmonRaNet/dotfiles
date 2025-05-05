@@ -66,13 +66,15 @@ fi
 
 if is_install "clang"; then
     echo_install $INSTALL_TARGET
-    ubuntu=$(lsb_release -cs)
-    echo -e "deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
-          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
-          deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
-          deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
-          " |  sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
-    wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    if is_ubuntu18; then
+      ubuntu=$(lsb_release -cs)
+      echo -e "deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
+            deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu} main \n \
+            deb http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
+            deb-src http://apt.llvm.org/${ubuntu}/ llvm-toolchain-${ubuntu}-${clang_version} main \n \
+            " |  sudo tee /etc/apt/sources.list.d/llvm.list > /dev/null
+      wget -q -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+    fi
     sudo apt-get -q update
 
     sudo apt-get --assume-yes --no-install-recommends install clang-$clang_version
