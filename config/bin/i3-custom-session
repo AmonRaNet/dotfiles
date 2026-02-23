@@ -195,6 +195,27 @@ case "$1" in
                 apply_display_mode
             fi
             ;;
+        dell-menu)
+            list="None"
+            list="${list}\nSwitch to DisplayPort       |select dp"
+            list="${list}\nSwitch to USB-C             |select usb-c"
+            list="${list}\nActivate SingleScreen       |single_mode"
+            list="${list}\nActivate Picture-by-Picture |pbp_mode"
+            list="${list}\nActivate PiP(small)         |pip_mode_small"
+            list="${list}\nActivate PiP(big)           |pip_mode_big"
+            list="${list}\nInvert PiP/PbP              |switch_kvm"
+            list="${list}\nChange PiP position         |switch_pip_position"
+            list="${list}\nChange PiP size             |switch_pip_size"
+            choice=$(echo -e "$list" | rofi -i -dmenu -p "DellMode" -select "None" | awk '{split($0,a,"[|]"); print a[2]}')
+            if [ "$choice" = "" ]; then
+                exit 0
+            fi
+            if [ "$choice" = "None" ]; then
+                exit 0
+            else
+                i3-custom-dell $choice
+            fi
+            ;;
         autolock)
             list="off\n1\n2\n3\n5\n10\n15\n30\n60"
             current=$(current_autolock_time)

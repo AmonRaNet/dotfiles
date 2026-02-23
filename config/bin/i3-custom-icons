@@ -3,7 +3,8 @@ set -e
 
 if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
     THIS=${BASH_SOURCE[0]}
-    echo "Convert keywords to font-icons (stdin -> stdout)"
+    echo "Convert keywords to font-glyph (Powerline Font) (stdin -> stdout)"
+    echo "Examples here: https://glyphsearch.com/"
     echo "---------------------"
     echo "Usage: $THIS"
     exit
@@ -25,6 +26,7 @@ ICONS=( "OUT:"
         "MEMORY:"
         "DISK:"
         "SWAP:"
+        "MONITOR:"
       )
 
 if [ ! "$#" -eq 0 ]; then

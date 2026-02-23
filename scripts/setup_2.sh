@@ -24,6 +24,7 @@ choice=($(whiptail \
   $(install_target xautolock) \
   $(install_target notify-osd) \
   $(install_target compton xorg-compositor) \
+  $(install_target ddcutil monitor-manager-cli) \
   $(install_target sysstat) \
   $(install_target chrome) \
   $(install_target default-jre) \
@@ -74,6 +75,7 @@ simple=("gnome-tweak-tool" \
         "kbdd" \
         "xautolock" \
         "compton" \
+        "ddcutil" \
         "sysstat" \
         "default-jre" \
         "default-jdk" \

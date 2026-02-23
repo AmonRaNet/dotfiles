@@ -1,0 +1,103 @@
+#! /bin/bash
+set -e
+#set -x
+
+if [ "$1" = "help" ] || [ "$1" = "--help" ] || [ "$1" = "-h" ]; then
+    THIS=${BASH_SOURCE[0]}
+    ACTIONS=$(grep -E -o "\s+[a-zA-Z\_\-]+\)" $THIS)
+    ACTIONS=$(echo "$ACTIONS" | sed -e 's/[\*\)]//g')
+    echo "Run Dell monitor action(ddcutil)"
+    echo "---------------------"
+    echo "Usage: $THIS <action>"
+    echo "where action:"
+    echo "$ACTIONS"
+    exit
+fi
+
+app_exists() {
+    set +e
+    command -v $1 > /dev/null
+    local result=$?
+    set -e
+    return $result
+}
+
+notify () {
+    notify-send --icon=dialog-information Dell-Monitor "$1"
+}
+
+# ddcutil mandatory
+if ! app_exists "ddcutil"; then
+    notify "not possible because ddcutil missing"
+    exit
+fi
+
+case "$1" in
+    switch)
+      # if hdmi is active, then go to usb
+      if ddcutil getvcp 60 | grep -q 'sl=0x11'; then
+        # usb-c
+        next_target="0x1b"
+      # if usb is active, then go to hdmi
+      elif ddcutil getvcp 60 | grep -q 'sl=0x1b'; then
+        # display port
+        next_target="0x0f"
+      # if hdmi is active, tehn go to usb
+      else
+        # hdmi
+        next_target="0x11"
+      fi
+
+      ddcutil setvcp 60 "$next_target"
+      ;;
+    select)
+      if test -n "$2" ; then
+          if test "$2" == "usb-c" ; then
+              next_target="0x1b"
+          elif test "$2" == "dp" ; then
+              next_target="0x0f"
+          elif test "$2" == "hdmi" ; then
+              next_target="0x11"
+          else
+              echo "Unknown/unsupported parameter '$2' to argument 'select'."
+              exit 1
+          fi || exit 1
+      fi || exit 1
+
+      ddcutil setvcp 60 "$next_target"
+      ;;
+    single_mode)
+      # exit from pip/pbp
+      ddcutil setvcp E9 0x0
+      ;;
+    switch_pip_size)
+      # switch between small and big pip window size
+      ddcutil setvcp E9 0x01
+      ;;
+    switch_pip_position)
+      # switch pip window position
+      ddcutil setvcp E9 0x2
+      ;;
+    pip_mode_small)
+      # enter on pip small window size
+      ddcutil setvcp E9 0x21
+      ;;
+    pip_mode_big)
+      # enter on pip big window size
+      ddcutil setvcp E9 0x1
+      ;;
+    pbp_mode)
+      # enter on pbp mode
+      ddcutil setvcp E9 0x24
+      ;;
+    switch_kvm)
+      # switch video sources on pip/pbp mode
+      ddcutil setvcp E5 0xF001
+      # switch usb hub target on pip/pbp mode
+      ddcutil setvcp E7 0xFF00
+      ;;
+    *)
+      echo "Invalid or unsupported argument '$1'."
+      exit 1
+      ;;
+esac

@@ -13,6 +13,11 @@ command=echo "HOME: $(whoami)"
 color=#ffff00
 interval=once
 
+[display]
+label=MONITOR:
+command=echo "$(xrandr | grep '*' | awk '{print $1}') ($(xrandr | grep -Eo '([0-9]+\.[0-9]+)\*' | awk -F'*' '{ print $1 }') Hz)"
+interval=10
+
 [iface]
 label=NETWORK:
 color=#00FF00

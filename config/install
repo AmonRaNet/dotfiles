@@ -64,6 +64,7 @@ if app_exists "i3"; then
                   "playerctl" \
                   "xrandr" \
                   "arandr" \
+                  "ddcutil" \
                   "scrot")
     for i in ${dependencies[@]}
     do
