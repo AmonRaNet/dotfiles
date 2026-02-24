@@ -17,6 +17,7 @@ home="$(readlink -f ~)"
 i3_session_path=$home/.i3_session
 display_mode_path=$i3_session_path/screenlayout
 last_display_mode_file=$i3_session_path/display_mode
+last_xrandr_file=$i3_session_path/xrandr_output
 autolock_file=$i3_session_path/auto_lock
 
 mkdir -p $i3_session_path
@@ -194,6 +195,27 @@ case "$1" in
                 write_display_mode $choice
                 apply_display_mode
             fi
+            ;;
+        display-info)
+            echo "$(xrandr | grep '*' | awk '{print $1}') ( $(xrandr | grep -Eo '([0-9]+\.[0-9]+)\*' | awk -F'*' '{ print $1 }') Hz )"
+            ;;
+        display-auto-resolution)
+            new_output=$(xrandr | md5sum)
+            old_output=$(cat $last_xrandr_file 2>/dev/null || echo "")
+            if [ "$new_output" = "$old_output" ]; then
+                i3-custom-session display-info
+                exit 0
+            fi
+            echo "$new_output" > $last_xrandr_file
+
+            current_resolution=$(xrandr | grep '*' | awk '{print $1}')
+            if [ "$current_resolution" = "" ]; then
+                if [ -f $display_mode_path/auto-resolution.sh ]; then
+                    $display_mode_path/auto-resolution.sh
+                fi
+            fi
+
+            i3-custom-session display-info
             ;;
         dell-menu)
             list="None"

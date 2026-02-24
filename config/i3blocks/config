@@ -15,7 +15,7 @@ interval=once
 
 [display]
 label=MONITOR:
-command=echo "$(xrandr | grep '*' | awk '{print $1}') ($(xrandr | grep -Eo '([0-9]+\.[0-9]+)\*' | awk -F'*' '{ print $1 }') Hz)"
+command=i3-custom-session display-auto-resolution
 interval=10
 
 [iface]
